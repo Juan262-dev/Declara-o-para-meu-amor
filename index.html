@@ -154,26 +154,23 @@
 
     <!-- TELA 2: A DECLARAÇÃO -->
     <div id="telaSurpresa">
-        <h1>Eu sabia que tu me amava, mas... 🥰</h1>
+        <h1>Eu sabia que tu me amava mais! 🥰</h1>
         
         <div class="texto-declaracao">
             O meu amor por vc é maior que qualquer coisa que existe no mundo, eu agradeço por vc sempre esta comigo e quero esta com vc sempre fazer coisas pela a primeira vez com vc e sei que existe várias coisa, vc é a pessoa mais importante pra mim e é a melhor pessoa do mundo, eu quero você sempre e toda hora. Eu te amo demais! ❤️
         </div>
 
         <div class="galeria">
-            <!-- FOTO 1 -->
             <div class="polaroid">
                 <img src="https://i.imgur.com/zKPMj1z.jpg" alt="Foto 1">
                 <div class="legenda-foto">Nossa lembrança linda ✨</div>
             </div>
 
-            <!-- FOTO 2 -->
             <div class="polaroid">
                 <img src="https://i.imgur.com/X6tkfUY.jpg" alt="Foto 2">
                 <div class="legenda-foto">Meu grudinho pra vida toda 👩‍❤️‍👨</div>
             </div>
 
-            <!-- FOTO 3 -->
             <div class="polaroid">
                 <img src="https://i.imgur.com/2KKbZUp.jpg" alt="Foto 3">
                 <div class="legenda-foto">Te amo hoje e sempre ❤️</div>
@@ -185,6 +182,22 @@
 
     <script>
         let tamanhoSim = 1;
+        
+        // Lista de frases dinâmicas que vão aparecendo no botão "Não"
+        let frasesNao = [
+            "Não 🙄",
+            "Certeza?",
+            "Pensa bem...",
+            "Vai dar ruim!",
+            "Clica no verde vai!",
+            "Errou feio!",
+            "Tenta de novo kkkk",
+            "Tá negando o invicto?",
+            "Não fuja do amor!",
+            "O verde tá brilhando ali ó 👀",
+            "Desiste logo, amor kkkk"
+        ];
+        let indiceFrase = 0;
 
         function fugirBotao() {
             let btnNao = document.getElementById("btnNao");
@@ -201,7 +214,12 @@
             btnNao.style.left = x + "px";
             btnNao.style.top = y + "px";
 
-            tamanhoSim += 0.12;
+            // Muda a frase do botão "Não" sequencialmente
+            indiceFrase = (indiceFrase + 1) % frasesNao.length;
+            btnNao.innerText = frasesNao[indiceFrase];
+
+            // Faz o botão Sim crescer
+            tamanhoSim += 0.1;
             btnSim.style.transform = `scale(${tamanhoSim})`;
         }
 
@@ -215,6 +233,10 @@
             document.getElementById("btnSim").style.transform = `scale(1)`;
             let btnNao = document.getElementById("btnNao");
             btnNao.style.position = "static";
+            
+            // Reseta a primeira frase
+            indiceFrase = 0;
+            btnNao.innerText = frasesNao[0];
 
             document.getElementById("telaSurpresa").style.display = "none";
             document.getElementById("telaPergunta").style.display = "block";
