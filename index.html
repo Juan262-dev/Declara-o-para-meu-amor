@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para o meu amor ❤️</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Tela 1: Pergunta */
+        #telaPergunta {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .botoes-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            height: 100px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        #btnSim {
+            background-color: #2ecc71;
+            color: white;
+            z-index: 10;
+        }
+
+        #btnNao {
+            background-color: #e74c3c;
+            color: white;
+            position: absolute;
+            transition: all 0.15s ease;
+        }
+
+        /* Tela 2: Surpresa / Declaração */
+        #telaSurpresa {
+            display: none;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .texto-declaracao {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 22px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: justify;
+        }
+
+        /* Estilo Polaroid para as Fotos */
+        .galeria {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .polaroid {
+            background: #fff;
+            color: #333;
+            padding: 12px 12px 25px 12px;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transform: rotate(-2deg);
+            transition: transform 0.3s;
+        }
+
+        .polaroid:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .legenda-foto {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: cursive;
+            color: #555;
+        }
+
+        .btn-voltar {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA 1: A PERGUNTA -->
+    <div id="telaPergunta">
+        <h1 id="perguntaTexto">Tu me amas de verdade? ❤️</h1>
+        <div class="botoes-container">
+            <button class="btn" id="btnSim" onclick="aceitoAmor()">Sim! 😍</button>
+            <button class="btn" id="btnNao" onmouseover="fugirBotao()" onclick="fugirBotao()">Não 🙄</button>
+        </div>
+    </div>
+
+    <!-- TELA 2: A DECLARAÇÃO E AS FOTOS -->
+    <div id="telaSurpresa">
+        <h1>Eu sabia que tu me amava mais! 🥰</h1>
+        
+        <div class="texto-declaracao" id="textoDeclaracao">
+            Eu só queria te agradecer por tudo. Sou imensamente feliz por estar ao teu lado todos os dias. Tu és absolutamente tudo pra mim, a pessoa que ilumina os meus dias e que me faz querer ser melhor. Obrigado por ser essa namorada incrível. Te amo demais! ❤️🔥
+        </div>
+
+        <div class="galeria">
+            <!-- FOTO 1 -->
+            <div class="polaroid">
+                <img src="https://imgur.com/X6tkfUY.jpg" alt="Nossa foto 1">
+                <div class="legenda-foto">O dia mais legal do nosso ano ✨</div>
+            </div>
+
+            <!-- FOTO 2 -->
+            <div class="polaroid">
+                <img src="https://imgur.com/zKPMj1z.jpg" alt="Nossa foto 2">
+                <div class="legenda-foto">Meu grudinho pra vida toda 👩‍❤️‍👨</div>
+            </div>
+
+            <!-- FOTO 3 -->
+            <div class="polaroid">
+                <img src="https://imgur.com/2KKbZUp.jpg" alt="Nossa foto 3">
+                <div class="legenda-foto">A dona do meu coração 💖</div>
+            </div>
+        </div>
+
+        <button class="btn-voltar" onclick="voltarInicio()">Recomeçar</button>
+    </div>
+
+    <script>
+        let tamanhoSim = 1.1;
+
+        // Função do botão "Não" fugir e fazer o "Sim" crescer
+        function fugirBotao() {
+            let btnNao = document.getElementById("btnNao");
+            let btnSim = document.getElementById("btnSim");
+
+            let maxX = window.innerWidth - 120;
+            let maxY = window.innerHeight - 100;
+
+            let randomX = Math.floor(Math.random() * maxX);
+            let randomY = Math.floor(Math.random() * maxY);
+
+            btnNao.style.position = "fixed";
+            btnNao.style.left = randomX + "px";
+            btnNao.style.top = randomY + "px";
+
+            tamanhoSim += 0.15;
+            btnSim.style.transform = `scale(${tamanhoSim})`;
+        }
+
+        // Quando ela clica em Sim
+        function aceitoAmor() {
+            document.getElementById("telaPergunta").style.display = "none";
+            document.getElementById("telaSurpresa").style.display = "block";
+            window.scrollTo(0, 0);
+        }
+
+        // Voltar para a pergunta inicial
+        function voltarInicio() {
+            tamanhoSim = 1.1;
+            document.getElementById("btnSim").style.transform = `scale(1)`;
+            let btnNao = document.getElementById("btnNao");
+            btnNao.style.position = "absolute";
+            btnNao.style.left = "auto";
+            btnNao.style.top = "auto";
+
+            document.getElementById("telaSurpresa").style.display = "none";
+            document.getElementById("telaPergunta").style.display = "block";
+        }
+    </script>
+</body>
+  </html>
+  
