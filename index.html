@@ -86,8 +86,6 @@
             justify-content: center;
             gap: 20px;
             align-items: center;
-            position: relative;
-            height: 100px;
         }
 
         .btn {
@@ -110,7 +108,6 @@
         #btnNao {
             background-color: #e74c3c;
             color: white;
-            position: absolute;
             transition: all 0.1s ease;
         }
 
@@ -272,7 +269,7 @@
     <!-- ABA 2: CRONÔMETRO E TEXTO DE AMOR -->
     <div id="aba-cronometro" class="conteudo-aba">
         <div class="cronometro-box">
-            <h2>Juntos desde 29/10 às 20:33h ✨</h2>
+            <h2>Juntos desde 29/09 às 20:33h ✨</h2>
             <div class="tempo-grid" id="contadorTempo">
                 <!-- Preenchido via JavaScript -->
             </div>
@@ -338,9 +335,7 @@
             tamanhoSim = 1;
             document.getElementById("btnSim").style.transform = `scale(1)`;
             let btnNao = document.getElementById("btnNao");
-            btnNao.style.position = "absolute";
-            btnNao.style.left = "auto";
-            btnNao.style.top = "auto";
+            btnNao.style.position = "static";
             
             indiceFrase = 0;
             btnNao.innerText = frasesNao[0];
@@ -349,9 +344,9 @@
             document.getElementById("telaPergunta").style.display = "block";
         }
 
-        // Cronômetro do Início do Namoro (29 de Outubro, 20:33h)
-        // Nota: Ajusta o mês (10 = Outubro, pois no JS os meses vão de 0 a 11)
-        const dataInicio = new Date(2026, 9, 29, 20, 33, 0);
+        // Cronômetro do Início do Namoro (29 de Setembro, 20:33h)
+        // Mês 8 = Setembro (no JS, 0=Janeiro, 8=Setembro)
+        const dataInicio = new Date(2026, 8, 29, 20, 33, 0);
 
         function atualizarCronometro() {
             const agora = new Date();
