@@ -10,7 +10,7 @@
 //   relato: 'Texto fornecido por vocês'
 // Não associe automaticamente as fotos à data do começo do namoro.
 window.albumMemorias = Object.freeze([
-  Object.freeze({ fotoIndice: 0, data: null, relato: '' }),
+  Object.freeze({ fotoIndice: 0, data: 28/09/2026, relato: 'Um dia antes do aniversário do meu amor' }),
   Object.freeze({ fotoIndice: 1, data: null, relato: '' }),
   Object.freeze({ fotoIndice: 2, data: null, relato: '' }),
   Object.freeze({ fotoIndice: 3, data: null, relato: '' }),
