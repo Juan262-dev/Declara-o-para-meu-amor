@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#fffaf6">
-  <meta name="description" content="Um álbum de memórias especial: nossas fotos, nossa cartinha e cada segundo da nossa história.">
+  <meta name="description" content="Nossa História Infinita: um livro de memórias reais, nossas fotos, cartinha e cada segundo da nossa história.">
   <meta property="og:title" content="Para o meu amor ❤️">
   <meta property="og:description" content="Um pedacinho da nossa história, feito com carinho.">
   <meta property="og:type" content="website">
-  <title>Para o meu amor ❤️</title>
+  <title>Nossa História Infinita ❤️ | Para o meu amor</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="memorias.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -23,6 +24,7 @@
       </a>
       <nav class="nav-links" aria-label="Navegação principal">
         <a href="#historia">História</a>
+        <a href="#capitulos">Capítulos</a>
         <a href="#cartinha">Cartinha</a>
         <a href="#galeria">Fotos</a>
         <a href="#tempo">Nosso tempo</a>
@@ -36,8 +38,8 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <span class="eyebrow">Um pedacinho de nós</span>
-          <h1 id="tituloInicio">A nossa história, feita de <em>amor.</em></h1>
-          <p class="hero-description">Um lugar para guardar os nossos momentos favoritos, lembrar de cada detalhe e celebrar tudo o que ainda vamos viver.</p>
+          <h1 id="tituloInicio">Nossa <em>História Infinita.</em></h1>
+          <p class="hero-description">A nossa história, feita de amor. Um lugar para guardar os momentos que conhecemos e abrir espaço para tudo o que ainda vamos viver.</p>
           <span class="date-chip"><span aria-hidden="true">♡</span> Juntos desde 29/09/2026, às 20h33</span>
           <div class="hero-actions">
             <a class="button button-primary" href="#cartinha">Ler minha cartinha <span aria-hidden="true">✉</span></a>
@@ -75,6 +77,43 @@
           </div>
         </div>
         <p class="story-footnote">E a nossa história continua sendo escrita… ✿</p>
+      </div>
+    </section>
+
+    <section class="section section-chapters" id="capitulos" aria-labelledby="tituloCapitulos">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Páginas que já existem</span>
+          <h2 id="tituloCapitulos">Nossa História Infinita</h2>
+          <p>Uma data confirmada, três fotos e nenhum acontecimento inventado. Cada lembrança tem seu lugar.</p>
+        </div>
+        <div class="chapter-book">
+          <div class="book-cover" aria-label="Capa do nosso livro de memórias">
+            <span class="book-cover-flower" aria-hidden="true">✿</span>
+            <span class="book-cover-kicker">Um álbum de memórias</span>
+            <h3>Nossa<br><em>História</em><br>Infinita</h3>
+            <span class="book-cover-symbol" aria-hidden="true">♡</span>
+            <p>Desde 29 de setembro de 2026</p>
+            <a href="#primeiroCapitulo" class="book-cover-link">Abrir o primeiro capítulo <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="book-pages">
+            <article class="book-start" id="primeiroCapitulo">
+              <span class="book-page-label">Uma data que sabemos</span>
+              <h3>O início do namoro</h3>
+              <p class="book-date">29 de setembro de 2026, às 20h33</p>
+              <p>É a data que marca o começo da nossa contagem. As fotos abaixo são lembranças do álbum, sem datas atribuídas.</p>
+            </article>
+            <div class="book-chapters-heading">
+              <h3>Fotografias do nosso álbum</h3>
+              <p>Na ordem da galeria, não necessariamente na ordem em que aconteceram.</p>
+            </div>
+            <div id="listaCapitulos" class="chapters-list" aria-label="Capítulos com nossas fotografias">
+              <p class="chapter-fallback">As três fotografias também estão disponíveis na <a href="#galeria">galeria original</a>.</p>
+            </div>
+            <noscript><p class="chapter-fallback">Ative o JavaScript para navegar pelos capítulos fotográficos, ou veja as fotos na galeria abaixo.</p></noscript>
+            <p class="book-ending">O resto dessa história fica para as lembranças que ainda vamos contar. ♡</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -144,6 +183,17 @@
             <div class="time-unit"><span id="tempoMinutos" class="time-value">0</span><span class="time-label">Min</span></div>
             <div class="time-unit"><span id="tempoSegundos" class="time-value">0</span><span class="time-label">Seg</span></div>
           </div>
+          <aside class="next-celebration" aria-labelledby="proximaComemoracaoTitulo">
+            <div>
+              <span class="next-celebration-kicker">Próxima comemoração mensal</span>
+              <h3 id="proximaComemoracaoTitulo">Mais um capítulo juntos</h3>
+              <p id="proximaComemoracaoData">Calculando a próxima data…</p>
+            </div>
+            <div class="next-celebration-count" aria-live="off">
+              <strong id="proximoMarco">♡</strong>
+              <span id="faltamDias">Carregando contagem…</span>
+            </div>
+          </aside>
           <p class="counter-message">Cada segundo ao teu lado é um presente. Esse cronômetro não para de rodar, assim como o meu amor por ti que cresce a cada instante. Obrigado por seres a melhor parte dos meus dias. Te amo pra sempre! 💍❤️</p>
         </div>
       </div>
