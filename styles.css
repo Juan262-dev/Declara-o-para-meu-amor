@@ -670,3 +670,37 @@ a { color: inherit; }
     transform: none;
   }
 }
+
+
+/* Datas e relatos sincronizados entre capítulos, galeria e foto ampliada. */
+.memory-extra-date {
+  display: block;
+  color: var(--rose-dark);
+  font-size: .78rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.memory-extra-story {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.dialog-memory-info {
+  padding: 10px 6px 0;
+  text-align: center;
+}
+.dialog-memory-date {
+  margin: 0;
+  color: var(--rose-dark);
+  font-size: .83rem;
+  font-weight: 700;
+}
+.dialog-memory-story {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font: italic 1rem/1.5 var(--display);
+  overflow-wrap: anywhere;
+}
