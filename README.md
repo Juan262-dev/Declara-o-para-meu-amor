@@ -1,29 +1,35 @@
-# Declaração para meu amor ❤️
+# Para o meu amor ❤️
 
-Uma página romântica e interativa feita com **HTML, CSS e JavaScript**, sem precisar instalar bibliotecas ou usar servidor.
+Uma página romântica no estilo **álbum de memórias**, feita com HTML, CSS e JavaScript. Não precisa de servidor nem de ferramentas de instalação.
 
-## Funcionalidades
+## O que tem no álbum
 
-- Pergunta interativa com botões “Sim” e “Não”.
-- Declaração com três fotografias e suas legendas.
-- Aba **Nosso Tempo** com cronômetro desde **29/09/2026 às 20:33**.
-- Layout adaptado para telas pequenas.
+- **Início:** apresentação da história, com duas prévias de fotos.
+- **Nossa história:** a data do começo do namoro, em **29/09/2026 às 20h33**.
+- **Cartinha:** um envelope interativo que revela a declaração original.
+- **Galeria:** três fotografias em cartões tipo Polaroid; toque para abrir ampliada, navegar e fechar.
+- **Nosso tempo:** cronômetro com anos, meses, dias, horas, minutos e segundos.
+- **Surpresa:** a brincadeira original com os botões “Sim” e “Não”.
 
-## Como abrir
+## Arquivos
 
-Abra o arquivo `index.html` em um navegador. Para publicar na web, você também pode utilizar o GitHub Pages.
+- `index.html`: estrutura e textos, incluindo os endereços e legendas das fotos.
+- `styles.css`: cores, tipografia, decoração e ajustes para celular.
+- `app.js`: galeria ampliada, cronômetro e lógica da surpresa.
 
-## Como personalizar
+Para usar, abra `index.html` em um navegador moderno ou publique os arquivos juntos no GitHub Pages.
 
-Tudo fica no arquivo `index.html`:
+## Personalização
 
-- **Data e horário:** altere `const dataInicio = new Date(2026, 8, 29, 20, 33, 0)`. Em JavaScript, os meses começam no zero: `8` representa setembro.
-- **Declaração:** edite o texto dentro de `<div class="texto-declaracao">` na aba de declaração.
-- **Fotografias:** substitua os endereços `src` das três tags `<img>` e personalize as legendas.
-- **Frases do botão “Não”:** altere a lista `frasesNao`.
+- **Data do namoro:** edite `const dataInicio = new Date(2026, 8, 29, 20, 33, 0)` no arquivo `app.js`. Os meses no JavaScript começam em zero (setembro = 8).
+- **Fotos:** atualize os endereços `src` nas imagens do `index.html`. A galeria usa as imagens e legendas da própria página, sem duplicá-las no JavaScript.
+- **Declarações:** edite os parágrafos da seção `#cartinha` e `#tempo` em `index.html`.
+- **Frases do botão “Não”:** edite a lista `frasesNao` em `app.js`.
+- **Cores:** ajuste as variáveis em `:root` no início de `styles.css`.
 
 ## Observações
 
-- O cronômetro usa a data e o fuso horário do dispositivo de quem abre a página.
-- As fotografias atuais vêm de links externos do Imgur. Se algum link deixar de funcionar, será necessário substituí-lo. Para maior estabilidade, é recomendável hospedar as imagens no próprio repositório.
-- O cronômetro conta meses e anos por calendário, e os dias, horas, minutos e segundos pelo tempo decorrido desde o último aniversário mensal.
+- O relógio considera a data e o fuso horário do dispositivo de quem abre a página.
+- As imagens atuais são carregadas do Imgur. Para maior estabilidade, coloque as fotos no próprio repositório e atualize os caminhos.
+- A página usa fontes do Google Fonts quando há conexão; se estiver offline, utiliza fontes alternativas.
+- O diálogo de fotografias aceita fechamento pelo botão “×” ou tecla Esc, e as setas do teclado passam entre as fotos.
