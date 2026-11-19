@@ -645,3 +645,28 @@ a { color: inherit; }
   .next-celebration-count { border-left: 0; border-top: 1px solid #eddce0; padding: 12px 0 0; }
   .nav-links a { font-size: .69rem; padding: 6px 7px; }
 }
+
+
+/* Cinco lembranças: centraliza a segunda fileira em telas largas. */
+@media (min-width: 731px) {
+  .gallery-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .gallery-grid > .memory-card {
+    grid-column: span 2;
+  }
+  .gallery-grid > .memory-card:nth-child(4) {
+    grid-column: 2 / span 2;
+  }
+  .gallery-grid > .memory-card:nth-child(5) {
+    grid-column: 4 / span 2;
+  }
+}
+.memory-card:nth-child(4) { transform: rotate(-1deg); }
+.memory-card:nth-child(5) { transform: rotate(1.5deg); }
+@media (max-width: 730px) {
+  .gallery-grid > .memory-card:nth-child(n) {
+    grid-column: auto;
+    transform: none;
+  }
+}
