@@ -26,6 +26,7 @@
         /* Sistema de Abas */
         .abas-container {
             display: flex;
+            width: min(100%, 500px);
             gap: 10px;
             margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.2);
@@ -35,6 +36,7 @@
         }
 
         .aba-btn {
+            flex: 1;
             background: transparent;
             border: none;
             color: white;
@@ -108,15 +110,16 @@
         #btnNao {
             background-color: #e74c3c;
             color: white;
+            max-width: calc(100vw - 24px);
+            overflow-wrap: anywhere;
+            z-index: 11;
             transition: all 0.1s ease;
         }
 
         /* Tela 2: Declaração */
         #telaSurpresa {
             display: none;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 10px;
+            padding: 10px 0;
         }
 
         .texto-declaracao {
@@ -215,14 +218,41 @@
             text-transform: uppercase;
             opacity: 0.9;
         }
+
+        .btn:focus-visible,
+        .aba-btn:focus-visible,
+        .btn-voltar:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 14px; }
+            .abas-container { gap: 4px; }
+            .aba-btn { padding: 10px 8px; font-size: 0.84rem; }
+            h1 { font-size: 1.45rem; }
+            #telaPergunta { margin-top: 28px; }
+            .botoes-container { gap: 12px; }
+            .btn { padding: 12px 18px; }
+            .texto-declaracao { padding: 16px; text-align: left; }
+            .tempo-grid { gap: 6px; }
+            .tempo-item { padding: 8px 4px; }
+            .tempo-numero { font-size: 1.1rem; }
+            .tempo-label { font-size: 0.68rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .conteudo-aba { animation: none; }
+            .aba-btn, .btn, #btnNao { transition: none; }
+        }
     </style>
 </head>
 <body>
 
     <!-- ABAS DE NAVEGAÇÃO -->
-    <div class="abas-container">
-        <button class="aba-btn ativo" onclick="mudarAba('declaracao')">Declaração ❤️</button>
-        <button class="aba-btn" onclick="mudarAba('cronometro')">Nosso Tempo ⏳</button>
+    <div class="abas-container" role="group" aria-label="Seções do aplicativo">
+        <button type="button" class="aba-btn ativo" aria-controls="aba-declaracao" aria-pressed="true" onclick="mudarAba('declaracao')">Declaração ❤️</button>
+        <button type="button" class="aba-btn" aria-controls="aba-cronometro" aria-pressed="false" onclick="mudarAba('cronometro')">Nosso Tempo ⏳</button>
     </div>
 
     <!-- ABA 1: DECLARAÇÃO + JOGO DO BOTÃO -->
@@ -233,7 +263,7 @@
             <h1>Tu me amas de verdade? ❤️</h1>
             <div class="botoes-container">
                 <button class="btn" id="btnSim" onclick="aceitoAmor()">Sim! 😍</button>
-                <button class="btn" id="btnNao" onmouseover="fugirBotao()" ontouchstart="fugirBotao()" onclick="fugirBotao()">Não 🙄</button>
+                <button class="btn" id="btnNao" onpointerenter="if (event.pointerType === 'mouse') fugirBotao()" onclick="fugirBotao()">Não 🙄</button>
             </div>
         </div>
 
@@ -267,11 +297,16 @@
     </div>
 
     <!-- ABA 2: CRONÔMETRO E TEXTO DE AMOR -->
-    <div id="aba-cronometro" class="conteudo-aba">
+    <div id="aba-cronometro" class="conteudo-aba" aria-hidden="true">
         <div class="cronometro-box">
             <h2>Juntos desde 29/09 às 20:33h ✨</h2>
-            <div class="tempo-grid" id="contadorTempo">
-                <!-- Preenchido via JavaScript -->
+            <div class="tempo-grid" id="contadorTempo" aria-label="Tempo de relacionamento">
+                <div class="tempo-item"><div class="tempo-numero" id="tempoAnos">0</div><div class="tempo-label">Anos</div></div>
+                <div class="tempo-item"><div class="tempo-numero" id="tempoMeses">0</div><div class="tempo-label">Meses</div></div>
+                <div class="tempo-item"><div class="tempo-numero" id="tempoDias">0</div><div class="tempo-label">Dias</div></div>
+                <div class="tempo-item"><div class="tempo-numero" id="tempoHoras">0</div><div class="tempo-label">Horas</div></div>
+                <div class="tempo-item"><div class="tempo-numero" id="tempoMinutos">0</div><div class="tempo-label">Min</div></div>
+                <div class="tempo-item"><div class="tempo-numero" id="tempoSegundos">0</div><div class="tempo-label">Seg</div></div>
             </div>
         </div>
 
@@ -281,98 +316,140 @@
     </div>
 
     <script>
-        // Sistema de Abas
+        // Navegação entre as seções (inclusive por teclado)
         function mudarAba(nomeAba) {
-            document.querySelectorAll('.conteudo-aba').forEach(aba => aba.classList.remove('ativo'));
-            document.querySelectorAll('.aba-btn').forEach(btn => btn.classList.remove('ativo'));
+            const mostrarDeclaracao = nomeAba === 'declaracao';
+            const abaDeclaracao = document.getElementById('aba-declaracao');
+            const abaCronometro = document.getElementById('aba-cronometro');
 
-            if (nomeAba === 'declaracao') {
-                document.getElementById('aba-declaracao').classList.add('ativo');
-                document.querySelectorAll('.aba-btn')[0].classList.add('ativo');
-            } else {
-                document.getElementById('aba-cronometro').classList.add('ativo');
-                document.querySelectorAll('.aba-btn')[1].classList.add('ativo');
-            }
+            abaDeclaracao.classList.toggle('ativo', mostrarDeclaracao);
+            abaCronometro.classList.toggle('ativo', !mostrarDeclaracao);
+            abaDeclaracao.setAttribute('aria-hidden', String(!mostrarDeclaracao));
+            abaCronometro.setAttribute('aria-hidden', String(mostrarDeclaracao));
+
+            document.querySelectorAll('.aba-btn').forEach((btn, indice) => {
+                const ativo = indice === (mostrarDeclaracao ? 0 : 1);
+                btn.classList.toggle('ativo', ativo);
+                btn.setAttribute('aria-pressed', String(ativo));
+            });
         }
 
-        // Lógica do Botão Fugidio
+        // Brincadeira do botão "Não": mantém o botão dentro da tela
         let tamanhoSim = 1;
-        let frasesNao = [
+        const frasesNao = [
             "Não 🙄", "Certeza?", "Pensa bem...", "Vai dar ruim!",
             "Clica no verde vai!", "Errou feio!", "Tenta de novo kkkk",
             "Tá negando o invicto?", "Não fuja do amor!", "O verde tá brilhando ali ó 👀", "Eu te amo, aperta no verde pfvr"
         ];
         let indiceFrase = 0;
 
+        function posicionarBotaoNao(aleatorio = true) {
+            const btnNao = document.getElementById('btnNao');
+            const margem = 12;
+            btnNao.style.position = 'fixed';
+
+            // Mede o botão APÓS mudar sua frase, pois cada texto tem largura diferente.
+            const larguraDisponivel = Math.max(0, window.innerWidth - btnNao.offsetWidth);
+            const alturaDisponivel = Math.max(0, window.innerHeight - btnNao.offsetHeight);
+            const minX = Math.min(margem, larguraDisponivel);
+            const minY = Math.min(margem, alturaDisponivel);
+            const maxX = Math.max(minX, larguraDisponivel - margem);
+            const maxY = Math.max(minY, alturaDisponivel - margem);
+
+            const xAtual = Number.parseFloat(btnNao.style.left) || minX;
+            const yAtual = Number.parseFloat(btnNao.style.top) || minY;
+            const x = aleatorio ? minX + Math.random() * (maxX - minX) : Math.min(maxX, Math.max(minX, xAtual));
+            const y = aleatorio ? minY + Math.random() * (maxY - minY) : Math.min(maxY, Math.max(minY, yAtual));
+
+            btnNao.style.left = x + 'px';
+            btnNao.style.top = y + 'px';
+        }
+
         function fugirBotao() {
-            let btnNao = document.getElementById("btnNao");
-            let btnSim = document.getElementById("btnSim");
-
-            btnNao.style.position = "fixed";
-
-            let x = Math.random() * (window.innerWidth - 140);
-            let y = Math.random() * (window.innerHeight - 100);
-
-            x = Math.max(20, x);
-            y = Math.max(20, y);
-
-            btnNao.style.left = x + "px";
-            btnNao.style.top = y + "px";
+            const btnNao = document.getElementById('btnNao');
+            const btnSim = document.getElementById('btnSim');
 
             indiceFrase = (indiceFrase + 1) % frasesNao.length;
-            btnNao.innerText = frasesNao[indiceFrase];
+            btnNao.textContent = frasesNao[indiceFrase];
+            posicionarBotaoNao();
 
-            tamanhoSim += 0.12;
+            // Evita que o botão "Sim" cresça até cobrir o resto do aplicativo.
+            tamanhoSim = Math.min(1.45, tamanhoSim + 0.12);
             btnSim.style.transform = `scale(${tamanhoSim})`;
         }
 
+        window.addEventListener('resize', () => {
+            const btnNao = document.getElementById('btnNao');
+            if (btnNao.style.position === 'fixed') posicionarBotaoNao(false);
+        });
+
         function aceitoAmor() {
-            document.getElementById("telaPergunta").style.display = "none";
-            document.getElementById("telaSurpresa").style.display = "block";
+            document.getElementById('telaPergunta').style.display = 'none';
+            document.getElementById('telaSurpresa').style.display = 'block';
         }
 
         function voltarInicio() {
             tamanhoSim = 1;
-            document.getElementById("btnSim").style.transform = `scale(1)`;
-            let btnNao = document.getElementById("btnNao");
-            btnNao.style.position = "static";
-            
-            indiceFrase = 0;
-            btnNao.innerText = frasesNao[0];
+            document.getElementById('btnSim').style.transform = 'scale(1)';
+            const btnNao = document.getElementById('btnNao');
+            btnNao.style.position = '';
+            btnNao.style.left = '';
+            btnNao.style.top = '';
 
-            document.getElementById("telaSurpresa").style.display = "none";
-            document.getElementById("telaPergunta").style.display = "block";
+            indiceFrase = 0;
+            btnNao.textContent = frasesNao[0];
+            document.getElementById('telaSurpresa').style.display = 'none';
+            document.getElementById('telaPergunta').style.display = 'block';
         }
 
-        // Cronômetro do Início do Namoro (29 de Setembro, 20:33h)
-        // Mês 8 = Setembro (no JS, 0=Janeiro, 8=Setembro)
+        // Início do relacionamento: 29 de setembro de 2026, às 20:33.
+        // A contagem considera o fuso horário local do dispositivo.
         const dataInicio = new Date(2026, 8, 29, 20, 33, 0);
+
+        // Soma meses de calendário, respeitando a duração real de cada mês.
+        function aniversarioAposMeses(data, meses) {
+            const aniversario = new Date(
+                data.getFullYear(), data.getMonth() + meses, 1,
+                data.getHours(), data.getMinutes(), data.getSeconds()
+            );
+            const ultimoDiaMes = new Date(
+                aniversario.getFullYear(), aniversario.getMonth() + 1, 0
+            ).getDate();
+            aniversario.setDate(Math.min(data.getDate(), ultimoDiaMes));
+            return aniversario;
+        }
 
         function atualizarCronometro() {
             const agora = new Date();
-            let diferenca = agora - dataInicio;
+            let totalMeses = Math.max(
+                0,
+                (agora.getFullYear() - dataInicio.getFullYear()) * 12
+                    + agora.getMonth() - dataInicio.getMonth()
+            );
 
-            if (diferenca < 0) diferenca = 0;
+            if (aniversarioAposMeses(dataInicio, totalMeses) > agora) {
+                totalMeses = Math.max(0, totalMeses - 1);
+            }
 
-            const segundos = Math.floor(diferenca / 1000) % 60;
-            const minutos = Math.floor(diferenca / (1000 * 60)) % 60;
-            const horas = Math.floor(diferenca / (1000 * 60 * 60)) % 24;
-            const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24)) % 30;
-            const meses = Math.floor(diferenca / (1000 * 60 * 60 * 24 * 30.436875)) % 12;
-            const anos = Math.floor(diferenca / (1000 * 60 * 60 * 24 * 365.25));
+            const marco = aniversarioAposMeses(dataInicio, totalMeses);
+            let restante = Math.max(0, agora - marco);
+            const dias = Math.floor(restante / 86400000);
+            restante %= 86400000;
+            const horas = Math.floor(restante / 3600000);
+            restante %= 3600000;
+            const minutos = Math.floor(restante / 60000);
+            const segundos = Math.floor((restante % 60000) / 1000);
 
-            document.getElementById("contadorTempo").innerHTML = `
-                <div class="tempo-item"><div class="tempo-numero">${anos}</div><div class="tempo-label">Anos</div></div>
-                <div class="tempo-item"><div class="tempo-numero">${meses}</div><div class="tempo-label">Meses</div></div>
-                <div class="tempo-item"><div class="tempo-numero">${dias}</div><div class="tempo-label">Dias</div></div>
-                <div class="tempo-item"><div class="tempo-numero">${horas}</div><div class="tempo-label">Horas</div></div>
-                <div class="tempo-item"><div class="tempo-numero">${minutos}</div><div class="tempo-label">Min</div></div>
-                <div class="tempo-item"><div class="tempo-numero">${segundos}</div><div class="tempo-label">Seg</div></div>
-            `;
+            document.getElementById('tempoAnos').textContent = Math.floor(totalMeses / 12);
+            document.getElementById('tempoMeses').textContent = totalMeses % 12;
+            document.getElementById('tempoDias').textContent = dias;
+            document.getElementById('tempoHoras').textContent = horas;
+            document.getElementById('tempoMinutos').textContent = minutos;
+            document.getElementById('tempoSegundos').textContent = segundos;
         }
 
-        setInterval(atualizarCronometro, 1000);
         atualizarCronometro();
+        setInterval(atualizarCronometro, 1000);
     </script>
 </body>
 </html>
