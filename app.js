@@ -12,6 +12,76 @@
   const fotoAnterior = document.getElementById('fotoAnterior');
   const proximaFoto = document.getElementById('proximaFoto');
   let fotoAtual = 0;
+  let origemDaFoto = null;
+
+  // Capítulos fotográficos: títulos, imagens e legendas vêm da galeria
+  // original. O arquivo memorias.js registra apenas datas e relatos
+  // OPCIONAIS. Isso impede que uma foto receba uma história inventada.
+  const listaCapitulos = document.getElementById('listaCapitulos');
+
+  function dataDaMemoria(iso) {
+    if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+      return 'Data não informada';
+    }
+    const [ano, mes, dia] = iso.split('-').map(Number);
+    const data = new Date(ano, mes - 1, dia);
+    if (data.getFullYear() !== ano || data.getMonth() !== mes - 1 || data.getDate() !== dia) {
+      return 'Data não informada';
+    }
+    return data.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function renderizarCapitulos() {
+    if (!listaCapitulos || !Array.isArray(window.albumMemorias)) return;
+    const capitulos = [];
+
+    window.albumMemorias.forEach((memoria, indice) => {
+      if (!Number.isInteger(memoria.fotoIndice) || !fotos[memoria.fotoIndice]) return;
+      const imagemGaleria = fotos[memoria.fotoIndice].querySelector('img');
+      const legenda = fotos[memoria.fotoIndice].querySelector('.memory-caption')?.textContent?.trim();
+      if (!imagemGaleria || !legenda) return;
+
+      const capitulo = document.createElement('article');
+      capitulo.className = 'chapter-card';
+
+      const botaoFoto = document.createElement('button');
+      botaoFoto.type = 'button';
+      botaoFoto.className = 'chapter-photo';
+      botaoFoto.setAttribute('aria-label', 'Ampliar fotografia: ' + legenda);
+      const imagem = document.createElement('img');
+      imagem.src = imagemGaleria.getAttribute('src');
+      imagem.alt = imagemGaleria.alt;
+      imagem.loading = 'lazy';
+      imagem.decoding = 'async';
+      botaoFoto.append(imagem);
+      botaoFoto.addEventListener('click', () => abrirFoto(memoria.fotoIndice, botaoFoto));
+
+      const info = document.createElement('div');
+      info.className = 'chapter-info';
+      const numero = document.createElement('span');
+      numero.className = 'chapter-ordinal';
+      numero.textContent = 'Fotografia ' + String(indice + 1).padStart(2, '0');
+
+      const titulo = document.createElement('h4');
+      titulo.textContent = legenda;
+      const data = document.createElement('p');
+      data.className = 'chapter-meta';
+      data.textContent = dataDaMemoria(memoria.data);
+
+      const relato = document.createElement('p');
+      relato.className = 'chapter-text';
+      relato.textContent = typeof memoria.relato === 'string' && memoria.relato.trim()
+        ? memoria.relato.trim()
+        : 'Relato ainda não registrado.';
+
+      info.append(numero, titulo, data, relato);
+      capitulo.append(botaoFoto, info);
+      capitulos.push(capitulo);
+    });
+    if (capitulos.length) listaCapitulos.replaceChildren(...capitulos);
+  }
+
+  renderizarCapitulos();
 
   function exibirFoto(indice) {
     if (!fotos.length) return;
@@ -25,7 +95,8 @@
     dialogTitulo.textContent = legenda.textContent;
   }
 
-  function abrirFoto(indice) {
+  function abrirFoto(indice, disparador = null) {
+    origemDaFoto = disparador || fotos[indice];
     exibirFoto(indice);
     if (typeof dialog.showModal === 'function') {
       dialog.showModal();
@@ -41,10 +112,10 @@
     } else {
       dialog.removeAttribute('open');
     }
-    fotos[fotoAtual]?.focus();
+    (origemDaFoto || fotos[fotoAtual])?.focus();
   }
 
-  fotos.forEach((botao, indice) => botao.addEventListener('click', () => abrirFoto(indice)));
+  fotos.forEach((botao, indice) => botao.addEventListener('click', () => abrirFoto(indice, botao)));
   fecharFoto.addEventListener('click', fecharGaleria);
   fotoAnterior.addEventListener('click', () => exibirFoto(fotoAtual - 1));
   proximaFoto.addEventListener('click', () => exibirFoto(fotoAtual + 1));
@@ -86,6 +157,37 @@
     return aniversario;
   }
 
+  // Próximo aniversário mensal, calculado pela mesma data e fuso do cronômetro.
+  function nomeDoMarco(totalMeses) {
+    const anos = Math.floor(totalMeses / 12);
+    const meses = totalMeses % 12;
+    const partes = [];
+    if (anos) partes.push(anos + (anos === 1 ? ' ano' : ' anos'));
+    if (meses) partes.push(meses + (meses === 1 ? ' mês' : ' meses'));
+    return partes.join(' e ');
+  }
+
+  function atualizarProximaComemoracao(agora, totalMeses) {
+    const proximoMes = totalMeses + 1;
+    const proximaData = aniversarioAposMeses(dataInicio, proximoMes);
+    // Diferença em dias de calendário, sem depender da duração de dias com horário de verão.
+    const hojeUTC = Date.UTC(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    const proximoUTC = Date.UTC(proximaData.getFullYear(), proximaData.getMonth(), proximaData.getDate());
+    const diasRestantes = Math.max(0, Math.round((proximoUTC - hojeUTC) / 86400000));
+    const textoFaltam = diasRestantes === 0
+      ? 'É hoje! ♡'
+      : diasRestantes === 1 ? 'Falta 1 dia' : 'Faltam ' + diasRestantes + ' dias';
+
+    document.getElementById('proximoMarco').textContent = nomeDoMarco(proximoMes);
+    document.getElementById('faltamDias').textContent = textoFaltam;
+    document.getElementById('proximaComemoracaoData').textContent =
+      proximaData.toLocaleDateString('pt-BR', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      }) + ' às ' + proximaData.toLocaleTimeString('pt-BR', {
+        hour: '2-digit', minute: '2-digit', hour12: false
+      });
+  }
+
   function atualizarCronometro() {
     const agora = new Date();
     let totalMeses = Math.max(
@@ -110,6 +212,7 @@
     camposTempo.horas.textContent = horas;
     camposTempo.minutos.textContent = Math.floor(restante / 60000);
     camposTempo.segundos.textContent = Math.floor(restante % 60000 / 1000);
+    atualizarProximaComemoracao(agora, totalMeses);
   }
 
   atualizarCronometro();
