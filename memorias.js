@@ -1,6 +1,6 @@
 // Nossa História Infinita — metadados opcionais das fotos do álbum.
 //
-// As três fotografias, seus links e legendas continuam no index.html.
+// As cinco fotografias, seus links e legendas continuam no index.html.
 // Aqui só associamos cada uma a um capítulo, na MESMA ordem da galeria.
 // A ordem das fotos NÃO afirma que os acontecimentos foram cronológicos.
 //
@@ -12,5 +12,7 @@
 window.albumMemorias = Object.freeze([
   Object.freeze({ fotoIndice: 0, data: null, relato: '' }),
   Object.freeze({ fotoIndice: 1, data: null, relato: '' }),
-  Object.freeze({ fotoIndice: 2, data: null, relato: '' })
+  Object.freeze({ fotoIndice: 2, data: null, relato: '' }),
+  Object.freeze({ fotoIndice: 3, data: null, relato: '' }),
+  Object.freeze({ fotoIndice: 4, data: null, relato: '' })
 ]);
