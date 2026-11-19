@@ -4,7 +4,8 @@
 // Aqui só associamos cada uma a um capítulo, na MESMA ordem da galeria.
 // A ordem das fotos NÃO afirma que os acontecimentos foram cronológicos.
 //
-// Nenhuma data ou história das fotografias foi informada: ficam vazias.
+// Datas e relatos informados nas fotos 1 e 2 foram preservados abaixo.
+// As fotos 3 a 5 continuam sem data ou relato até serem preenchidas.
 // Para personalizar mais tarde, preencha:
 //   data: '2026-10-15'       // AAAA-MM-DD (exemplo de FORMATO, não uma data real)
 //   relato: 'Texto fornecido por vocês'

@@ -16,14 +16,14 @@ Um álbum de memórias romântico, com visual de livro e conteúdo real. Feito c
 
 - `index.html`: estrutura, textos, links e legendas das fotos.
 - `styles.css`: aparência delicada, livro, responsividade e acessibilidade.
-- `memorias.js`: associa as três fotografias a informações opcionais (data e relato). No momento, **todas as datas e histórias estão vazias**, pois não foram informadas.
+- `memorias.js`: associa as cinco fotografias às datas e aos relatos. As fotos 1 e 2 já têm data e relato informados; as fotos 3 a 5 permanecem sem esses detalhes.
 - `app.js`: capítulos, galeria ampliada, cronômetros e surpresa.
 
 Abra o `index.html` no navegador ou publique os arquivos juntos no GitHub Pages. Os scripts `memorias.js` e `app.js` precisam estar na mesma pasta.
 
 ## Como adicionar histórias reais às fotos
 
-A galeria do `index.html` é a fonte das imagens e legendas. Em `memorias.js`, cada capítulo aponta para a foto por `fotoIndice`: `0`, `1` ou `2`.
+A galeria do `index.html` é a fonte das imagens e legendas. Em `memorias.js`, cada capítulo aponta para a foto por `fotoIndice`: `0`, `1`, `2`, `3` ou `4`.
 
 Exemplo de **formato** (não é um acontecimento nem uma data real):
 
@@ -31,7 +31,7 @@ Exemplo de **formato** (não é um acontecimento nem uma data real):
 { fotoIndice: 0, data: 'AAAA-MM-DD', relato: 'Escreva aqui o que aconteceu de verdade.' }
 ```
 
-Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. O aplicativo mostrará **“Data não informada”** e **“Relato ainda não registrado”**. Isso evita atribuir histórias falsas às fotos.
+Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. O aplicativo mostrará **“Data não informada”** e **“Relato ainda não registrado”**. Dados preenchidos aparecem nos capítulos, nos cartões da galeria e ao ampliar as fotos. Isso evita atribuir histórias falsas às fotos.
 
 ## Como personalizar
 
@@ -44,7 +44,7 @@ Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. 
 ## Observações
 
 - A contagem do tempo e as comemorações utilizam o relógio e fuso horário local do dispositivo. Não há sincronização entre dispositivos.
-- As fotografias continuam hospedadas no Imgur. Caso os links parem de funcionar, coloque os arquivos no repositório e substitua os caminhos. O repositório é público: confirme a privacidade de qualquer nova foto ou lembrança antes de enviá-la.
+- As três fotografias originais continuam hospedadas no Imgur. Caso os links parem de funcionar, coloque os arquivos no repositório e substitua os caminhos. O repositório é público: confirme a privacidade de qualquer nova foto ou lembrança antes de enviá-la.
 - Google Fonts é opcional; há fontes alternativas caso não carregue.
 - A galeria pode ser fechada pelo botão de fechar ou pela tecla Esc, e as setas do teclado passam entre as fotos.
 
@@ -52,5 +52,5 @@ Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. 
 
 - `fotos/lembranca-04.webp` e `fotos/lembranca-05.webp`: recortes fiéis das duas imagens enviadas, mantendo apenas uma das duas cópias idênticas de cada foto.
 - O álbum agora contém **cinco fotografias**, com as três originais preservadas e duas imagens locais novas.
-- As novas fotos aparecem na galeria ampliável e nos capítulos; como não foram fornecidas datas ou histórias, os campos permanecem vazios.
+- As fotos 4 e 5 aparecem na galeria ampliável e nos capítulos; como não foram fornecidas datas ou histórias para elas, esses campos permanecem vazios.
 - Essas imagens ficam no repositório público junto do aplicativo.

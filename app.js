@@ -8,6 +8,8 @@
   const dialog = document.getElementById('fotoDialog');
   const dialogImg = document.getElementById('fotoAmpliada');
   const dialogTitulo = document.getElementById('fotoTitulo');
+  const dialogData = document.getElementById('fotoData');
+  const dialogRelato = document.getElementById('fotoRelato');
   const fecharFoto = document.getElementById('fecharFoto');
   const fotoAnterior = document.getElementById('fotoAnterior');
   const proximaFoto = document.getElementById('proximaFoto');
@@ -81,7 +83,37 @@
     if (capitulos.length) listaCapitulos.replaceChildren(...capitulos);
   }
 
+  // A galeria também exibe datas e relatos informados, além dos capítulos.
+  // Os valores são lidos do mesmo memorias.js, para não duplicar informações.
+  function obterMemoria(fotoIndice) {
+    return Array.isArray(window.albumMemorias)
+      ? window.albumMemorias.find(memoria => memoria.fotoIndice === fotoIndice)
+      : null;
+  }
+
+  function renderizarDetalhesNaGaleria() {
+    fotos.forEach((botao, indice) => {
+      const memoria = obterMemoria(indice);
+      if (!memoria) return;
+      const legenda = botao.querySelector('.memory-caption');
+      if (!legenda) return;
+      if (typeof memoria.data === 'string' && memoria.data) {
+        const data = document.createElement('span');
+        data.className = 'memory-extra-date';
+        data.textContent = dataDaMemoria(memoria.data);
+        legenda.after(data);
+      }
+      if (typeof memoria.relato === 'string' && memoria.relato.trim()) {
+        const relato = document.createElement('span');
+        relato.className = 'memory-extra-story';
+        relato.textContent = memoria.relato.trim();
+        botao.append(relato);
+      }
+    });
+  }
+
   renderizarCapitulos();
+  renderizarDetalhesNaGaleria();
 
   function exibirFoto(indice) {
     if (!fotos.length) return;
@@ -93,6 +125,12 @@
     dialogImg.src = imagem.currentSrc || imagem.src;
     dialogImg.alt = imagem.alt;
     dialogTitulo.textContent = legenda.textContent;
+
+    const memoria = obterMemoria(fotoAtual);
+    dialogData.textContent = memoria ? dataDaMemoria(memoria.data) : 'Data não informada';
+    dialogRelato.textContent = typeof memoria?.relato === 'string' && memoria.relato.trim()
+      ? memoria.relato.trim()
+      : 'Relato ainda não registrado.';
   }
 
   function abrirFoto(indice, disparador = null) {
