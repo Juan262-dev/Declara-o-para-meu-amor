@@ -477,3 +477,171 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+
+/* Nossa História Infinita — livro com capítulos baseados em memórias reais. */
+.section-chapters {
+  background: linear-gradient(160deg, #f8e9e9 0%, #fffaf6 37%, #f9eae6 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.chapter-book {
+  display: grid;
+  grid-template-columns: minmax(0, .79fr) minmax(0, 1.21fr);
+  align-items: start;
+  gap: clamp(20px, 4vw, 50px);
+  max-width: 1060px;
+  margin: 0 auto;
+}
+.book-cover {
+  position: sticky;
+  top: 108px;
+  min-height: 570px;
+  padding: 56px 25px 38px;
+  border-radius: 8px 21px 21px 8px;
+  border: 1px solid #af7890;
+  border-left: 15px solid #75445d;
+  background: radial-gradient(circle at 50% 20%, #bc819a 0%, transparent 50%),
+    linear-gradient(140deg, #aa738d, #6e3e58);
+  box-shadow: -9px 16px 0 #e7cdd2, 0 26px 38px rgba(64, 31, 46, .25);
+  color: #fff7ee;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+}
+.book-cover::before, .book-cover::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(255, 240, 228, .52);
+  border-radius: 4px 14px 14px 4px;
+}
+.book-cover::after {
+  inset: 24px;
+  border-color: rgba(255, 240, 228, .18);
+}
+.book-cover-flower { font-size: 3.2rem; margin-bottom: 16px; color: #ffe2d8; line-height: 1; }
+.book-cover-kicker { font-size: .67rem; letter-spacing: .23em; text-transform: uppercase; font-weight: 700; }
+.book-cover h3 { font: 500 clamp(2.7rem, 4.2vw, 4.7rem)/1.13 var(--display); margin: 17px 0 15px; letter-spacing: -.04em; }
+.book-cover h3 em { font-weight: 400; color: #ffe6da; }
+.book-cover-symbol { font: 2.2rem var(--display); line-height: 1; }
+.book-cover p { margin: 11px 0 24px; font-size: .79rem; color: #f8e1e8; }
+.book-cover-link {
+  position: relative;
+  z-index: 2;
+  background: #fff7ef;
+  border-radius: 35px;
+  padding: 10px 18px;
+  color: #743e58;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .75rem;
+  text-align: center;
+}
+.book-cover-link:hover { background: #f8e7e5; }
+.book-pages { padding: 20px 0; }
+.book-start {
+  position: relative;
+  padding: 30px;
+  background: #fffdfb;
+  border: 1px solid #eddce0;
+  border-radius: 12px;
+  box-shadow: 0 13px 26px rgba(104, 66, 78, .07);
+}
+.book-page-label, .chapter-ordinal {
+  display: block;
+  color: var(--rose-dark);
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.book-start h3 { font: 500 2rem/1.2 var(--display); color: var(--wine); margin: 8px 0; }
+.book-date { color: var(--rose-dark) !important; font-weight: 700; font-size: .86rem; }
+.book-start p { color: var(--muted); margin: 7px 0 0; }
+.book-chapters-heading { margin: 30px 0 17px; }
+.book-chapters-heading h3 { font: 500 1.75rem var(--display); color: var(--wine); margin: 0 0 4px; }
+.book-chapters-heading p { margin: 0; font-size: .82rem; color: var(--muted); }
+.chapters-list {
+  display: grid;
+  gap: 20px;
+}
+.chapter-card {
+  display: grid;
+  grid-template-columns: minmax(105px, .44fr) minmax(0, 1fr);
+  gap: clamp(14px, 2.5vw, 24px);
+  align-items: center;
+  border: 1px solid #eddce0;
+  background: #fffefa;
+  border-radius: 14px;
+  padding: 13px;
+  box-shadow: 0 12px 25px rgba(103, 64, 77, .08);
+}
+.chapter-photo {
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+  border: 0;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(80, 37, 54, .12);
+}
+.chapter-photo:hover { transform: rotate(-1.5deg); }
+.chapter-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 215px;
+  object-fit: contain;
+  background: #f8f1ed;
+}
+.chapter-info { padding: 8px 6px 8px 0; min-width: 0; }
+.chapter-info h4 { font: italic 500 clamp(1.35rem, 2vw, 1.65rem)/1.25 var(--display); color: var(--wine); margin: 7px 0 8px; overflow-wrap: anywhere; }
+.chapter-meta { color: var(--rose-dark); font-size: .75rem; font-weight: 700; margin: 0 0 7px; }
+.chapter-text { color: var(--muted); font-size: .85rem; line-height: 1.6; margin: 0; }
+.chapter-fallback { background: #fff; padding: 18px; border-radius: 12px; border: 1px solid #eddce0; color: var(--muted); }
+.chapter-fallback a { color: var(--rose-dark); text-underline-offset: 2px; }
+.book-ending { text-align: center; font: italic 1.13rem/1.65 var(--display); color: var(--rose-dark); margin: 25px 0 0; }
+
+.next-celebration {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  max-width: 790px;
+  margin: 27px auto 0;
+  padding: 20px 24px;
+  background: #fff;
+  border: 1px dashed #d9aabb;
+  border-radius: 18px;
+  text-align: left;
+}
+.next-celebration-kicker { color: var(--rose-dark); font-size: .65rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.next-celebration h3 { margin: 3px 0 7px; font: 500 1.53rem/1.25 var(--display); color: var(--wine); }
+.next-celebration p { color: var(--muted); margin: 0; font-size: .82rem; }
+.next-celebration-count { display: grid; justify-items: center; text-align: center; border-left: 1px solid #eddce0; padding-left: 20px; min-width: 156px; }
+.next-celebration-count strong { font: 500 clamp(1.6rem, 3vw, 2.1rem)/1.1 var(--display); color: var(--rose-dark); }
+.next-celebration-count span { color: var(--muted); font-size: .75rem; font-weight: 600; }
+
+@media (max-width: 780px) {
+  .chapter-book { grid-template-columns: 1fr; max-width: 565px; }
+  .book-cover { position: relative; top: auto; min-height: 400px; padding: 40px 20px 35px; }
+  .book-cover h3 { font-size: clamp(2.85rem, 8vw, 4.5rem); }
+  .book-pages { padding: 0; }
+  .nav-links { gap: 1px; }
+}
+@media (max-width: 420px) {
+  .chapter-card { grid-template-columns: minmax(90px, .46fr) minmax(0, 1fr); gap: 10px; padding: 10px; }
+  .chapter-photo { padding: 4px; }
+  .chapter-photo img { max-height: 190px; }
+  .chapter-info h4 { font-size: 1.2rem; }
+  .chapter-text { font-size: .77rem; }
+  .book-start { padding: 24px 18px; }
+  .next-celebration { grid-template-columns: 1fr; gap: 14px; text-align: center; padding: 18px; }
+  .next-celebration-count { border-left: 0; border-top: 1px solid #eddce0; padding: 12px 0 0; }
+  .nav-links a { font-size: .69rem; padding: 6px 7px; }
+}
