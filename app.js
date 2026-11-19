@@ -12,6 +12,7 @@
   const fotoAnterior = document.getElementById('fotoAnterior');
   const proximaFoto = document.getElementById('proximaFoto');
   let fotoAtual = 0;
+  let origemDaFoto = null;
 
   // Capítulos fotográficos: títulos, imagens e legendas vêm da galeria
   // original. O arquivo memorias.js registra apenas datas e relatos
@@ -53,7 +54,7 @@
       imagem.loading = 'lazy';
       imagem.decoding = 'async';
       botaoFoto.append(imagem);
-      botaoFoto.addEventListener('click', () => abrirFoto(memoria.fotoIndice));
+      botaoFoto.addEventListener('click', () => abrirFoto(memoria.fotoIndice, botaoFoto));
 
       const info = document.createElement('div');
       info.className = 'chapter-info';
@@ -94,7 +95,8 @@
     dialogTitulo.textContent = legenda.textContent;
   }
 
-  function abrirFoto(indice) {
+  function abrirFoto(indice, disparador = null) {
+    origemDaFoto = disparador || fotos[indice];
     exibirFoto(indice);
     if (typeof dialog.showModal === 'function') {
       dialog.showModal();
@@ -110,10 +112,10 @@
     } else {
       dialog.removeAttribute('open');
     }
-    fotos[fotoAtual]?.focus();
+    (origemDaFoto || fotos[fotoAtual])?.focus();
   }
 
-  fotos.forEach((botao, indice) => botao.addEventListener('click', () => abrirFoto(indice)));
+  fotos.forEach((botao, indice) => botao.addEventListener('click', () => abrirFoto(indice, botao)));
   fecharFoto.addEventListener('click', fecharGaleria);
   fotoAnterior.addEventListener('click', () => exibirFoto(fotoAtual - 1));
   proximaFoto.addEventListener('click', () => exibirFoto(fotoAtual + 1));
