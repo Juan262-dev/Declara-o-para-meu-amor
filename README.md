@@ -6,9 +6,9 @@ Um álbum de memórias romântico, com visual de livro e conteúdo real. Feito c
 
 - **Início:** capa e apresentação do álbum, com as fotos originais.
 - **Nossa história:** data confirmada do início do namoro, em **29/09/2026 às 20h33**.
-- **Capítulos do álbum:** capa de livro e três capítulos fotográficos baseados nas **fotos e legendas que já existiam**. A ordem é a da galeria, **não** uma cronologia inventada.
+- **Capítulos do álbum:** capa de livro e cinco capítulos fotográficos baseados nas **fotos e legendas que já existiam**. A ordem é a da galeria, **não** uma cronologia inventada.
 - **Cartinha:** envelope interativo com a declaração original.
-- **Galeria:** três fotografias em cartões Polaroid, ampliáveis e sem corte.
+- **Galeria:** cinco fotografias em cartões Polaroid, ampliáveis e sem corte.
 - **Nosso tempo:** cronômetro desde o começo do namoro e contagem para o próximo aniversário mensal.
 - **Surpresa:** brincadeira original dos botões “Sim” e “Não”.
 
@@ -47,3 +47,10 @@ Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. 
 - As fotografias continuam hospedadas no Imgur. Caso os links parem de funcionar, coloque os arquivos no repositório e substitua os caminhos. O repositório é público: confirme a privacidade de qualquer nova foto ou lembrança antes de enviá-la.
 - Google Fonts é opcional; há fontes alternativas caso não carregue.
 - A galeria pode ser fechada pelo botão de fechar ou pela tecla Esc, e as setas do teclado passam entre as fotos.
+
+## Novas fotografias
+
+- `fotos/lembranca-04.webp` e `fotos/lembranca-05.webp`: recortes fiéis das duas imagens enviadas, mantendo apenas uma das duas cópias idênticas de cada foto.
+- O álbum agora contém **cinco fotografias**, com as três originais preservadas e duas imagens locais novas.
+- As novas fotos aparecem na galeria ampliável e nos capítulos; como não foram fornecidas datas ou histórias, os campos permanecem vazios.
+- Essas imagens ficam no repositório público junto do aplicativo.
