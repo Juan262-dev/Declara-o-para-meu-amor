@@ -134,11 +134,23 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
 
+        /* Fotos maiores na tela grande, sem comprometer a leitura da declaração. */
+        #aba-declaracao {
+            max-width: 650px;
+        }
+
+        #telaSurpresa .texto-declaracao {
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .galeria {
             display: flex;
             flex-direction: column;
             gap: 20px;
             margin-bottom: 25px;
+            padding: 8px 10px;
         }
 
         .polaroid {
@@ -155,9 +167,10 @@
         }
 
         .polaroid img {
+            display: block;
             width: 100%;
-            height: 220px;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
             border-radius: 2px;
         }
 
