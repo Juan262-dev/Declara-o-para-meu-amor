@@ -704,3 +704,159 @@ a { color: inherit; }
   font: italic 1rem/1.5 var(--display);
   overflow-wrap: anywhere;
 }
+
+
+/* ETAPA 1 — um pequeno caderno para editar memórias sem tocar no código. */
+.section-editor {
+  background: radial-gradient(circle at 85% 13%, #f5dadd 0, transparent 40%),
+    linear-gradient(145deg, #fffaf6, #fbefee 70%, #fff9f3);
+  border-block: 1px solid var(--border);
+}
+.nav-links .nav-editor {
+  border: 1px solid #e8c8d3;
+  background: #fff1f3;
+  color: var(--rose-dark);
+}
+.nav-links .nav-editor:hover { background: #f9dfe6; }
+.editor-shell {
+  max-width: 810px;
+  margin: 0 auto;
+  border-radius: 24px;
+  border: 1px solid #e9c9d4;
+  box-shadow: var(--shadow);
+  background: #fffdfa;
+  padding: clamp(20px, 4vw, 36px);
+}
+.editor-intro { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
+.editor-intro-symbol {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  color: var(--wine);
+  background: #fae8ed;
+  border: 1px dashed #cb94a9;
+  border-radius: 17px;
+  font: 2.4rem/1 var(--display);
+}
+.editor-intro h3 { margin: 0 0 4px; font: 500 1.85rem/1.25 var(--display); color: var(--wine); }
+.editor-intro p { margin: 0; color: var(--muted); font-size: .91rem; }
+.editor-disclosure {
+  background: #fdf3f3;
+  border: 1px solid #edcfd5;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.editor-disclosure summary {
+  cursor: pointer;
+  list-style: none;
+  color: var(--wine);
+  font-weight: 700;
+  text-align: center;
+  padding: 15px;
+  background: #f7e5e8;
+  transition: background .2s;
+}
+.editor-disclosure summary:hover { background: #f4dce3; }
+.editor-disclosure summary::-webkit-details-marker { display: none; }
+.editor-disclosure[open] summary { border-bottom: 1px solid #edcfd5; }
+.editor-content { padding: clamp(18px, 4vw, 30px); }
+.editor-privacy {
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  background: #fffaf6;
+  border-left: 3px solid var(--rose);
+  border-radius: 8px;
+  font-size: .85rem;
+  color: var(--ink);
+}
+.editor-form { display: grid; gap: 16px; }
+.editor-field { display: grid; gap: 7px; min-width: 0; }
+.editor-field label { color: var(--wine); font-size: .86rem; font-weight: 700; }
+.editor-field input, .editor-field select, .editor-field textarea {
+  display: block;
+  width: 100%;
+  min-height: 47px;
+  border: 1px solid #dac6ca;
+  border-radius: 12px;
+  padding: 11px 13px;
+  background: #fff;
+  color: var(--ink);
+  font: 400 1rem/1.5 var(--body);
+  transition: border-color .2s, box-shadow .2s;
+}
+.editor-field textarea { min-height: 130px; resize: vertical; }
+.editor-field input:focus, .editor-field select:focus, .editor-field textarea:focus {
+  outline: 2px solid #c994a8;
+  border-color: var(--rose-dark);
+  outline-offset: 1px;
+}
+.editor-field small { color: var(--muted); line-height: 1.5; }
+.editor-preview {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 15px;
+  border: 1px dashed #d8b2be;
+  border-radius: 14px;
+  background: #fffaf8;
+}
+.editor-preview img {
+  width: auto;
+  height: auto;
+  max-height: 205px;
+  max-width: 100%;
+  object-fit: contain;
+  border: 8px solid #fff;
+  box-shadow: 0 6px 17px rgba(90, 45, 62, .13);
+}
+.editor-preview p { color: var(--muted); font-size: .78rem; margin: 0; }
+.editor-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.editor-actions .button { flex: 1 1 200px; }
+.editor-actions .button:disabled { cursor: not-allowed; opacity: .5; }
+.editor-reset {
+  background: transparent;
+  border: 0;
+  color: var(--rose-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  font-size: .8rem;
+  justify-self: start;
+  padding: 6px 1px;
+}
+.editor-reset:disabled { opacity: .5; cursor: not-allowed; }
+.editor-status {
+  min-height: 20px;
+  margin: 0;
+  color: #38644a;
+  font-size: .85rem;
+  font-weight: 600;
+}
+.editor-status[data-erro="true"] { color: #aa3652; }
+.editor-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: .77rem;
+  line-height: 1.65;
+}
+.editor-hint code { color: var(--rose-dark); }
+
+/* Se houver mais de cinco fotos, o grid deixa de centrar a última dupla. */
+@media (min-width: 731px) {
+  .gallery-grid.gallery-extended > .memory-card:nth-child(4),
+  .gallery-grid.gallery-extended > .memory-card:nth-child(5) { grid-column: span 2; }
+}
+@media (max-width: 730px) {
+  html { scroll-padding-top: 150px; }
+  .editor-intro-symbol { width: 58px; height: 58px; flex-basis: 58px; font-size: 1.9rem; }
+  .editor-intro h3 { font-size: 1.48rem; }
+  .editor-content { padding: 18px 15px; }
+}
+@media (max-width: 360px) {
+  .editor-shell { padding: 16px 12px; }
+  .editor-intro { gap: 10px; }
+  .editor-intro h3 { font-size: 1.3rem; }
+}
