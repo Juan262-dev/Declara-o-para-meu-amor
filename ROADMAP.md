@@ -46,3 +46,14 @@ Esta branch reúne as quatro etapas para revisão conjunta. O Pull Request fica 
 - Confirmar que todas as fotos e mensagens originais continuam acessíveis
 
 Nenhum acontecimento ou data de fotografias foi inventado.
+
+## Etapa 5 — Sincronização em nuvem sem login (código pronto, ativação pendente)
+
+- Criados os arquivos do banco PostgreSQL, Edge Function e Storage público no diretório `supabase/`.
+- O site carrega dados pelo endpoint público GET; os formulários salvam pelo POST com **código de edição longo**, verificado somente no servidor.
+- Upload de fotos JPG/PNG/WebP do celular até 5 MB.
+- Sincroniza relatos, datas, legendas, bilhetes, música e sonhos entre aparelhos.
+- Verifica atualizações e oferece botão para recarregar, sem fechar o formulário automaticamente.
+- Backup/restauração podem ser usados também no modo nuvem.
+- **Pendente:** o Supabase conectado exibiu uma organização, mas nenhum projeto. Não há banco ou Edge Function implantados ainda. Veja `SUPABASE-SETUP.md` para ativar após criação e configuração do projeto.
+- **Limite da escolha sem login:** qualquer visitante pode ver as lembranças; somente a edição exige código. O sistema NÃO oferece fotos privadas.
