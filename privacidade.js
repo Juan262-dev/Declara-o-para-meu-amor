@@ -120,8 +120,8 @@
     const extras = experiencias.ler();
     resumo.textContent = mems.length + ' fotos, ' +
       mems.filter(m => m.relato).length + ' relatos, ' +
-      (Array.isArray(publicados.bilhetes) ? publicados.bilhetes.length : 0) +
-      extras.bilhetes.length + ' bilhetes no total, ' + extras.sonhos.length +
+      new Set([...(Array.isArray(publicados.bilhetes) ? publicados.bilhetes : []), ...extras.bilhetes]).size +
+      ' bilhetes no total, ' + extras.sonhos.length +
       ' sonhos e ' + (extras.musica.url ? 'um link de música' : 'nenhum link de música') +
       '. Só os arquivos que você enviar ao GitHub serão publicados.';
   }
