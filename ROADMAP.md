@@ -55,5 +55,6 @@ Nenhum acontecimento ou data de fotografias foi inventado.
 - Sincroniza relatos, datas, legendas, bilhetes, música e sonhos entre aparelhos.
 - Verifica atualizações e oferece botão para recarregar, sem fechar o formulário automaticamente.
 - Backup/restauração podem ser usados também no modo nuvem.
-- **Pendente:** o Supabase conectado exibiu uma organização, mas nenhum projeto. Não há banco ou Edge Function implantados ainda. Veja `SUPABASE-SETUP.md` para ativar após criação e configuração do projeto.
+- **Backend configurado:** projeto Supabase `jfedjtdyjpvqzetlexuf` criado em São Paulo, tabelas e Storage implantados, função `album-sync` ativa, URL configurada na branch e código de edição forte registrado apenas por hash.
+- **Pendente:** publicar esta branch no GitHub Pages por merge do PR #8 (com autorização), e realizar teste real de ponta a ponta no navegador.
 - **Limite da escolha sem login:** qualquer visitante pode ver as lembranças; somente a edição exige código. O sistema NÃO oferece fotos privadas.
