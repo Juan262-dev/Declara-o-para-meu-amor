@@ -1139,3 +1139,55 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .chapter-page-active, .bilhete-revelado { animation: none !important; }
 }
+
+
+/* Sincronização sem login: progresso e atualização não intrusivos. */
+.cloud-status-bar {
+  padding: 8px 18px;
+  text-align: center;
+  background: #f8e9eb;
+  border-bottom: 1px solid #ecd7de;
+  color: var(--wine);
+  font-size: .79rem;
+  font-weight: 700;
+}
+.cloud-status-bar [data-erro="true"] { color: #a43850; }
+.cloud-update-banner {
+  position: sticky;
+  top: 79px;
+  z-index: 28;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #fff2e9;
+  border-bottom: 1px solid #e5c8bd;
+  box-shadow: 0 8px 22px rgba(99, 56, 70, .08);
+  color: var(--wine);
+  font-size: .88rem;
+  font-weight: 700;
+}
+#editarArquivoFoto {
+  padding: 12px 10px;
+  background: #fff;
+  border: 1px dashed #d6a7b5;
+  border-radius: 12px;
+  font-size: .83rem;
+  width: 100%;
+  max-width: 100%;
+}
+#editarArquivoFoto::file-selector-button {
+  border: 1px solid #d8afbd;
+  border-radius: 8px;
+  color: var(--wine);
+  background: #fbe8ef;
+  padding: 8px 12px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+@media (max-width: 730px) {
+  .cloud-update-banner { top: 122px; }
+  .cloud-status-bar { font-size: .74rem; }
+}
