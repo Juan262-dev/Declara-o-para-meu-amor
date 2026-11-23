@@ -1,5 +1,5 @@
 // Editor: usa a nuvem quando configurada; sem ela mantém o modo local.
-// O código de edição nunca fica em arquivos públicos.
+// No modo nuvem, visitantes podem editar sem login nem código.
 (() => {
   'use strict';
 
