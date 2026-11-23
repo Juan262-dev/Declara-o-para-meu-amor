@@ -1,36 +1,48 @@
-# Upgrade completo do App do Meu Amor ❤️
+# Upgrade completo — Nossa História Infinita ❤️
 
-Este plano mantém a versão publicada em `main` intacta até a aprovação de cada etapa. Cada entrega tem a própria branch e um Pull Request separado.
+Esta branch reúne as quatro etapas para revisão conjunta. O Pull Request fica em **rascunho**, sem merge na `main` antes da aprovação.
 
-## Etapa 1 — Editor de memórias (implementada nesta branch)
+## Etapa 1 — Editor de memórias (implementada)
 
-- Editar legenda, data, relato e caminho da foto sem editar código manualmente
-- Adicionar novas fotos por link HTTPS direto ou pelo caminho de arquivo já existente no repositório
-- Mostrar o conteúdo em capítulos, na galeria ampliada e nos cartões existentes
-- Guardar edições **somente no aparelho** com armazenamento local (não é uma conta ou banco de dados)
-- Exportar um novo `memorias.js` para publicação manual pelo GitHub
-- Limpar somente edições locais sem apagar as memórias publicadas
-- Estilo do editor compatível com o design romântico e com telas pequenas
+- Editar fotos já existentes: data, legenda, relato e caminho da imagem
+- Adicionar novas imagens por URL HTTPS direta ou caminho já existente em `fotos/`
+- Salvar no `localStorage` do navegador, exportar `memorias.js`, restaurar as memórias publicadas
+- Atualizar álbum, capítulos, modal e prévias após recarregar
 
-## Etapa 2 — Design premium (planejada)
+## Etapa 2 — Design premium (implementada)
 
-- Animações discretas de mudança de capítulo, com respeito à preferência por movimento reduzido
-- Indicador de capítulo e navegação mais fluida no celular
-- Refinamento do contraste, da apresentação das fotos e da velocidade de carregamento
+- Navegação pelos capítulos como páginas, com botões Anterior/Próxima
+- Indicador da página atual e animação sutil de transição
+- Ajustes para telas pequenas e `prefers-reduced-motion`
+- Áreas de bilhetes, música e sonhos integradas ao tema de scrapbook
 
-## Etapa 3 — Surpresas e comemorações (planejada)
+## Etapa 3 — Surpresas (implementada)
 
-- Pote de bilhetinhos escrito por quem usa o aplicativo
-- Mensagem de comemoração no dia 29, com efeitos opcionais
-- Cartão para a música do casal com **link para uma plataforma autorizada**, sem copiar ou reproduzir arquivos protegidos
-- Lista de sonhos para realizar juntos
+- Pote de bilhetinhos que sorteia mensagens já presentes no aplicativo e bilhetes que você criar
+- Adicionar e remover bilhetes extras (salvos apenas no aparelho)
+- Mensagem discreta de comemoração no dia 29, com base na data do namoro
+- Cartão para o link externo da música do casal, sem reproduzir ou hospedar áudio
+- Lista de sonhos com marcação de realizados e remoção (salva apenas no aparelho)
+- Arquivo `surpresas-data.js` com conteúdo publicado/editável
 
-## Etapa 4 — Atualização e privacidade (planejada, requer decisões)
+## Etapa 4 — Backup, restauração e publicação manual (implementada)
 
-- Avaliar uma forma de publicar lembranças sem substituir arquivos manualmente
-- Considerar uma área protegida para fotos e textos privados (precisa de autenticação/servidor; GitHub Pages público não oferece isso)
-- Avaliar upload de fotos com revisão de privacidade antes de tornar arquivos públicos
+- Backup JSON do álbum, incluindo metadados das fotos, bilhetes, música e sonhos
+- Importação de backups JSON com limites, verificação das datas, HTTPS, campos e confirmação
+- Exportação de `memorias.js` e `surpresas-data.js` para atualizar o GitHub
+- Aviso e confirmação obrigatória de que **os dados publicados no GitHub são públicos**
+- Sem envio automático de conteúdo à rede
 
-## O que está fora do escopo da etapa 1
+### O que NÃO é possível prometer com um site estático público
 
-Não existe sincronização automática com GitHub, upload direto do celular, banco de dados remoto, controle de acesso ou recursos das etapas 2–4. Nenhum relato ou data foi inventado.
+**Não há autenticação, banco remoto, sincronização automática entre aparelhos nem proteção real por senha das fotos.** Esses recursos exigem escolher e configurar um serviço de backend com autenticação e regras de acesso, além de tomar decisões sobre privacidade e custos. A quarta etapa aqui oferece **backup/restauração e publicação manual**, não privacidade de arquivos já publicados.
+
+## Antes do merge
+
+- Conferir o visual no celular e no desktop
+- Editar uma memória, recarregar e testar exportação
+- Criar bilhete, sonho e link de música
+- Testar backup, restauração e confirmação de publicação
+- Confirmar que todas as fotos e mensagens originais continuam acessíveis
+
+Nenhum acontecimento ou data de fotografias foi inventado.
