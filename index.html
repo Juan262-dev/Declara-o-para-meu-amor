@@ -14,6 +14,9 @@
   <script src="album-data.js?v=etapa1" defer></script>
   <script src="app.js?v=2026-11-19-fix-datas" defer></script>
   <script src="editor.js?v=etapa1" defer></script>
+  <script src="surpresas-data.js?v=etapa3" defer></script>
+  <script src="experiencias.js?v=etapa3" defer></script>
+  <script src="privacidade.js?v=etapa4" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -31,6 +34,7 @@
         <a href="#galeria">Fotos</a>
         <a class="nav-editor" href="#editor">Editar memórias</a>
         <a href="#tempo">Nosso tempo</a>
+        <a href="#extras">Extras ♡</a>
         <a class="nav-special" href="#surpresa">Surpresa ♡</a>
       </nav>
     </div>
@@ -113,6 +117,11 @@
             <div id="listaCapitulos" class="chapters-list" aria-label="Capítulos com nossas fotografias">
               <p class="chapter-fallback">As fotografias também estão disponíveis na <a href="#galeria">galeria original</a>.</p>
             </div>
+            <nav class="book-page-nav" id="navegacaoCapitulos" hidden aria-label="Virar páginas do álbum">
+              <button type="button" class="button button-outline button-small" id="capituloAnterior">← Página anterior</button>
+              <span id="capituloPagina" role="status" aria-live="polite"></span>
+              <button type="button" class="button button-primary button-small" id="capituloProximo">Próxima página →</button>
+            </nav>
             <noscript><p class="chapter-fallback">Ative o JavaScript para navegar pelos capítulos fotográficos, ou veja as fotos na galeria abaixo.</p></noscript>
             <p class="book-ending">O resto dessa história fica para as lembranças que ainda vamos contar. ♡</p>
           </div>
@@ -264,6 +273,11 @@
               <span id="faltamDias">Carregando contagem…</span>
             </div>
           </aside>
+          <div id="mensagemComemoracao" class="celebration-banner" hidden role="status">
+            <span aria-hidden="true">✿ ♡ ✿</span>
+            <strong>Hoje é dia 29!</strong>
+            <p>Mais uma data especial para lembrar do nosso começo. Que venham novos capítulos.</p>
+          </div>
           <p class="counter-message">Cada segundo ao teu lado é um presente. Esse cronômetro não para de rodar, assim como o meu amor por ti que cresce a cada instante. Obrigado por seres a melhor parte dos meus dias. Te amo pra sempre! 💍❤️</p>
         </div>
       </div>
@@ -290,10 +304,112 @@
         </div>
       </div>
     </section>
+
+    <section class="section section-extras" id="extras" aria-labelledby="tituloExtras">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Pequenas surpresas</span>
+          <h2 id="tituloExtras">Mais motivos para lembrar ♡</h2>
+          <p>Bilhetinhos, uma música especial e sonhos que vocês ainda vão escolher.</p>
+        </div>
+        <div class="extras-grid">
+          <article class="extra-card extra-notes">
+            <span class="extra-icon" aria-hidden="true">✉</span>
+            <h3>Um pote de bilhetinhos</h3>
+            <p class="extra-subtitle">Cada toque revela uma frase do álbum.</p>
+            <div class="note-paper">
+              <p id="bilheteSorteado" role="status" aria-live="polite">Tem um bilhetinho esperando para ser aberto… ♡</p>
+            </div>
+            <button type="button" class="button button-primary" id="sortearBilhete">Sortear um bilhete ♡</button>
+            <details class="extra-details">
+              <summary>Escrever meus próprios bilhetes</summary>
+              <form id="formNovoBilhete" class="extra-form">
+                <label for="textoNovoBilhete">Mensagem para guardar neste aparelho</label>
+                <textarea id="textoNovoBilhete" rows="3" maxlength="300" required placeholder="Escreva sua mensagem..."></textarea>
+                <button type="submit" class="button button-outline button-small">Guardar bilhete</button>
+              </form>
+              <ul id="listaBilhetesNovos" class="extra-manage-list" aria-label="Bilhetes adicionados neste aparelho"></ul>
+              <p class="extra-status" id="statusBilhetes" role="status" aria-live="polite"></p>
+            </details>
+          </article>
+
+          <article class="extra-card extra-music">
+            <span class="extra-icon" aria-hidden="true">♫</span>
+            <h3>Nossa música</h3>
+            <p class="extra-subtitle">Um cantinho para abrir uma música em um serviço autorizado.</p>
+            <div class="record-art" aria-hidden="true"><span>♡</span></div>
+            <p id="musicaNaoDefinida" class="extra-empty">Ainda não escolhemos um link para a música.</p>
+            <a id="abrirMusica" class="button button-primary" target="_blank" rel="noopener noreferrer" hidden>Ouvir a música ↗</a>
+            <details class="extra-details">
+              <summary>Personalizar o cartão de música</summary>
+              <form id="formMusica" class="extra-form">
+                <label for="musicaTitulo">Nome da música</label>
+                <input id="musicaTitulo" maxlength="110" type="text" placeholder="Nome da música">
+                <label for="musicaUrl">Link HTTPS (Spotify, YouTube Music etc.)</label>
+                <input id="musicaUrl" maxlength="1200" type="url" placeholder="https://...">
+                <button type="submit" class="button button-outline button-small">Salvar o link</button>
+              </form>
+              <p class="extra-status" id="statusMusica" role="status" aria-live="polite"></p>
+            </details>
+          </article>
+
+          <article class="extra-card extra-dreams">
+            <span class="extra-icon" aria-hidden="true">✧</span>
+            <h3>Coisas que queremos viver</h3>
+            <p class="extra-subtitle">Vocês escolhem o que colocar nesta lista de sonhos.</p>
+            <p class="extra-empty" id="sonhosVazio">Nenhum sonho adicionado ainda. Que tal escrever o primeiro?</p>
+            <ul class="dream-list" id="listaSonhos" aria-label="Lista de sonhos"></ul>
+            <form id="formNovoSonho" class="extra-form">
+              <label for="textoNovoSonho">Adicionar um sonho</label>
+              <input id="textoNovoSonho" type="text" maxlength="140" required placeholder="Algo que queremos fazer juntos...">
+              <button type="submit" class="button button-primary button-small">Adicionar à lista ♡</button>
+            </form>
+            <p class="extra-status" id="statusSonhos" role="status" aria-live="polite"></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-privacy" id="privacidade" aria-labelledby="tituloPrivacidade">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Cuide das lembranças</span>
+          <h2 id="tituloPrivacidade">Backup e publicação</h2>
+          <p>Guarde uma cópia do álbum ou prepare arquivos para o GitHub com atenção à privacidade.</p>
+        </div>
+        <div class="privacy-panel">
+          <div class="privacy-warning">
+            <h3>Antes de publicar, um cuidado importante</h3>
+            <p>O GitHub Pages e o repositório atual são públicos. Qualquer pessoa com acesso ao site ou ao repositório pode ver os arquivos publicados. Este app não tem login, senha ou armazenamento remoto privado. Salvar pelo editor ou pelas surpresas é local, neste navegador, e não sincroniza com outros celulares.</p>
+          </div>
+          <div class="privacy-grid">
+            <div class="privacy-card">
+              <h3>Guardar minhas lembranças</h3>
+              <p>Baixe um arquivo JSON com as fotos cadastradas, datas, relatos, bilhetes, música e sonhos. O arquivo contém informações pessoais; guarde-o em local seguro.</p>
+              <button class="button button-outline" type="button" id="baixarBackup">Baixar backup privado ↓</button>
+              <label class="privacy-import-label" for="restaurarBackup">Restaurar um backup JSON</label>
+              <input id="restaurarBackup" type="file" accept=".json,application/json">
+              <small>A restauração substitui apenas as edições deste navegador, após sua confirmação.</small>
+            </div>
+            <div class="privacy-card">
+              <h3>Preparar publicação pública</h3>
+              <p id="resumoPublicacao">Preparando resumo dos arquivos…</p>
+              <label class="privacy-consent"><input type="checkbox" id="confirmarPublicacao"> Entendo que fotos, datas, relatos, bilhetes e sonhos enviados ao GitHub ficarão públicos.</label>
+              <div class="privacy-export-actions">
+                <button type="button" class="button button-primary button-small" id="baixarPublicacaoMemorias" disabled>Baixar memorias.js</button>
+                <button type="button" class="button button-outline button-small" id="baixarPublicacaoSurpresas" disabled>Baixar surpresas-data.js</button>
+              </div>
+              <p class="privacy-tutorial">Revise os arquivos baixados e substitua-os no <a href="https://github.com/Juan262-dev/Declara-o-para-meu-amor" target="_blank" rel="noopener noreferrer">repositório do GitHub</a>. A publicação não é automática.</p>
+            </div>
+          </div>
+          <p class="extra-status" id="privacidadeStatus" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container">Um cantinho só nosso, cheio de lembranças <span class="footer-heart" aria-hidden="true">♡</span></div>
+    <div class="container">Um cantinho só nosso, cheio de lembranças <span class="footer-heart" aria-hidden="true">♡</span> · <a href="#privacidade">Backup e privacidade</a></div>
   </footer>
 
   <dialog class="photo-dialog" id="fotoDialog" aria-labelledby="fotoTitulo">
