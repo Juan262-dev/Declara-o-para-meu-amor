@@ -127,6 +127,18 @@
   }
 
   if (reunidos.length > 5) galeria.classList.add('gallery-extended');
+
+  // A capa acompanha eventuais trocas das duas primeiras fotografias.
+  const imagensDaCapa = document.querySelectorAll('.hero-polaroid img');
+  [0, 1].forEach(indice => {
+    const capa = imagensDaCapa[indice];
+    const original = fotosOriginais[indice];
+    if (capa && original) {
+      const fotoAtual = original.querySelector('img');
+      if (fotoAtual) capa.src = fotoAtual.getAttribute('src');
+    }
+  });
+
   window.albumMemorias = Object.freeze(reunidos);
   window.albumEditorConfig = Object.freeze({
     storageKey: STORAGE_KEY,
