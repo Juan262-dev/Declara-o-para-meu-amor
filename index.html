@@ -208,7 +208,7 @@
           <details class="editor-disclosure">
             <summary>✿ Abrir editor de memórias</summary>
             <div class="editor-content">
-              <p class="editor-privacy"><strong>Sem login:</strong> no modo nuvem, qualquer pessoa pode ver as lembranças, mas só quem conhece o código de edição pode alterá-las. Sem Supabase configurado, o editor continua salvando apenas neste aparelho. Não publique informações que precisam ser privadas.</p>
+              <p class="editor-privacy"><strong>Atenção: edição pública.</strong> Com a nuvem conectada, qualquer pessoa que abrir o site poderá adicionar ou modificar fotos, datas, relatos e surpresas <strong>sem login e sem código</strong>. As mudanças aparecem para todos. Não publique informações privadas; baixe backups para recuperar alterações indesejadas. A frequência das edições e dos uploads é limitada para reduzir abusos.</p>
               <form id="formEditorMemorias" class="editor-form">
                 <div class="editor-field">
                   <label for="editarEscolhaFoto">Qual fotografia você quer atualizar?</label>
@@ -241,12 +241,12 @@
                   <small>JPG, PNG ou WebP, até 5 MB. Após salvar, a imagem ficará publicamente acessível no álbum.</small>
                 </div>
                 <div class="editor-actions">
-                  <button class="button button-primary" type="submit" id="editarSalvar">Salvar neste aparelho ♡</button>
+                  <button class="button button-primary" type="submit" id="editarSalvar">Salvar lembrança ♡</button>
                   <button class="button button-outline" type="button" id="editarExportar">Baixar memorias.js ↓</button>
                 </div>
                 <button class="editor-reset" type="button" id="editarLimpar">Descartar minhas alterações locais</button>
                 <p id="editarStatus" class="editor-status" role="status" aria-live="polite"></p>
-                <p class="editor-hint">Com Supabase conectado, o botão Salvar sincroniza imediatamente com os outros aparelhos. Sem nuvem, use o botão de exportação e substitua <code>memorias.js</code> no GitHub. O código de edição é solicitado somente ao tentar alterar dados na nuvem.</p>
+                <p class="editor-hint">Com Supabase conectado, o botão Salvar sincroniza imediatamente com os outros aparelhos. Sem nuvem, use o botão de exportação e substitua <code>memorias.js</code> no GitHub. Ninguém precisa digitar código para salvar; qualquer visitante pode editar.</p>
               </form>
             </div>
           </details>
@@ -389,7 +389,7 @@
         <div class="privacy-panel">
           <div class="privacy-warning">
             <h3>Antes de publicar, um cuidado importante</h3>
-            <p>Este álbum não tem login e sua visualização é pública. Com Supabase configurado, novas fotos e relatos são sincronizados na nuvem e ficam acessíveis a visitantes. Somente a edição exige um código longo, verificado no servidor. Sem a nuvem, as alterações ficam apenas no navegador. Nenhum desses modos é um cofre privado.</p>
+            <p>Este álbum não tem login e sua visualização é pública. Com Supabase configurado, novas fotos e relatos são sincronizados na nuvem e ficam acessíveis a visitantes. As edições também são públicas e não exigem senha nem código. Sem a nuvem, as alterações ficam apenas no navegador. Nenhum desses modos é um cofre privado.</p>
           </div>
           <div class="privacy-grid">
             <div class="privacy-card">
@@ -398,7 +398,7 @@
               <button class="button button-outline" type="button" id="baixarBackup">Baixar backup privado ↓</button>
               <label class="privacy-import-label" for="restaurarBackup">Restaurar um backup JSON</label>
               <input id="restaurarBackup" type="file" accept=".json,application/json">
-              <small>Sem nuvem, restaura neste navegador. Com nuvem, a restauração também atualiza o álbum compartilhado mediante código e pode ser parcial caso a conexão caia.</small>
+              <small>Sem nuvem, restaura neste navegador. Com nuvem, a restauração atualiza o álbum compartilhado sem código e pode ser parcial caso a conexão caia. Qualquer visitante pode restaurar um backup válido.</small>
             </div>
             <div class="privacy-card">
               <h3>Preparar publicação pública</h3>
