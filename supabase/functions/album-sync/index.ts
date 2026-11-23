@@ -55,14 +55,14 @@ function urlFoto(valor: string) {
   );
 }
 
-function normalizarMemoria(dados: unknown): Memoria | null {
+function normalizarMemoria(dados: unknown, temArquivo = false): Memoria | null {
   if (!dados || typeof dados !== "object") return null;
   const d = dados as Record<string, unknown>;
   if (!Number.isInteger(d.fotoIndice) || (d.fotoIndice as number) < 0 ||
       (d.fotoIndice as number) >= MAX_MEMORIES ||
       typeof d.legenda !== "string" || !d.legenda.trim() || d.legenda.length > 110 ||
       typeof d.relato !== "string" || d.relato.length > 1600 ||
-      typeof d.src !== "string" || !urlFoto(d.src) ||
+      typeof d.src !== "string" || (!urlFoto(d.src) && !temArquivo) ||
       !dataValida(d.data)) return null;
   return {
     fotoIndice: d.fotoIndice as number,
@@ -207,7 +207,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (acao === "salvar-memoria") {
-      const memoria = normalizarMemoria(corpo);
+      const memoria = normalizarMemoria(corpo, Boolean(imagem));
       if (!memoria) return json({ erro: "Preencha todos os campos obrigatórios corretamente." }, 400, cors);
 
       const { data: existentes, error: erroExistentes } = await supabase
