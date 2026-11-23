@@ -12,6 +12,21 @@ As fotos e mensagens publicadas continuam no app. Novas imagens e relatos enviad
 
 O plano das próximas etapas está em [ROADMAP.md](ROADMAP.md).
 
+## Upgrade completo — etapas 2, 3 e 4
+
+A branch de revisão também inclui:
+
+- **Livro navegável:** botões para avançar ou voltar um capítulo com transições suaves e indicador de página, respeitando preferência por movimento reduzido.
+- **Pote de bilhetinhos:** sorteia frases já existentes no álbum e aceita mensagens adicionais salvas somente no navegador.
+- **Comemoração mensal:** cartão especial que aparece no dia 29 a partir do início do namoro.
+- **Música do casal:** campo para nome e link HTTPS externo, sem cópia/reprodução da música no próprio app.
+- **Sonhos:** lista de coisas a realizar com checkboxes para acompanhar, adicionar e remover; salva somente no navegador.
+- **Backup:** exportação de um arquivo JSON com fotos (links e legendas), datas, relatos, bilhetes, música e sonhos. As imagens em si não são incorporadas ao backup.
+- **Restauração:** opção para importar o JSON e repor os dados locais após confirmação; não altera os arquivos do GitHub.
+- **Publicação consciente:** botão para baixar `memorias.js` e `surpresas-data.js`, desbloqueado só depois de confirmar que o repositório é público. A substituição no GitHub é **manual**.
+
+Os dados pessoais criados no editor, nos bilhetes, na música e nos sonhos ficam no navegador até uma publicação manual. O repositório permanece público: **não existe senha nem proteção de acesso ao conteúdo publicado**. Um sistema realmente privado ou com sincronização precisa de backend e autenticação configurados separadamente. Consulte [ROADMAP.md](ROADMAP.md) para os detalhes.
+
 ## O que há no aplicativo
 
 - **Início:** capa e apresentação do álbum, com as fotos originais.
@@ -29,9 +44,12 @@ O plano das próximas etapas está em [ROADMAP.md](ROADMAP.md).
 - `memorias.js`: dados publicados, incluindo datas, relatos e, opcionalmente, legenda e endereço para imagens adicionais. As fotos 1 e 2 têm datas e relatos; as outras três permanecem sem esses detalhes.
 - `album-data.js`: sincroniza a configuração publicada com edições salvas apenas no navegador e prepara a galeria.
 - `editor.js`: formulário acessível, exportação de `memorias.js` e opção para limpar alterações locais.
+- `surpresas-data.js`: bilhetes do álbum e conteúdo público configurável de música e sonhos.
+- `experiencias.js`: navegação pelas páginas, bilhetes, data especial, música e lista de sonhos.
+- `privacidade.js`: exportação de backup, importação validada e publicação manual consciente.
 - `app.js`: capítulos, galeria ampliada, cronômetros e surpresa.
 
-Abra o `index.html` no navegador ou publique os arquivos juntos no GitHub Pages. Os scripts `memorias.js`, `album-data.js`, `app.js` e `editor.js` precisam estar na mesma pasta.
+Abra o `index.html` no navegador ou publique os arquivos juntos no GitHub Pages. Os scripts `memorias.js`, `album-data.js`, `app.js`, `editor.js`, `surpresas-data.js`, `experiencias.js` e `privacidade.js` precisam estar na mesma pasta.
 
 ## Como adicionar histórias reais às fotos
 
