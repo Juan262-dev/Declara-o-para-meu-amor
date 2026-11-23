@@ -1,5 +1,5 @@
-// Editor de memórias: não publica nada nem envia dados para servidores.
-// Salvar = guardar somente no navegador. Exportar = baixar memorias.js.
+// Editor: usa a nuvem quando configurada; sem ela mantém o modo local.
+// O código de edição nunca fica em arquivos públicos.
 (() => {
   'use strict';
 
@@ -11,6 +11,8 @@
   const campoData = document.getElementById('editarData');
   const campoRelato = document.getElementById('editarRelato');
   const campoFoto = document.getElementById('editarFonteFoto');
+  const campoArquivo = document.getElementById('editarArquivoFoto');
+  const nuvem = window.albumCloud;
   const previa = document.getElementById('editarPrevia');
   const botaoSalvar = document.getElementById('editarSalvar');
   const botaoExportar = document.getElementById('editarExportar');
@@ -67,10 +69,13 @@
     campoData.value = memoria?.data || '';
     campoRelato.value = memoria?.relato || '';
     campoFoto.value = memoria?.src || '';
-    campoFoto.required = indice === -1;
+    campoFoto.required = indice === -1 && !nuvem?.enabled;
+    if (campoArquivo) campoArquivo.value = '';
     atualizarPrevia();
     mensagem(indice === -1
-      ? 'Para uma foto nova, cole um link direto HTTPS ou um caminho já enviado ao GitHub em fotos/.'
+      ? (nuvem?.enabled
+        ? 'Use uma foto JPG, PNG ou WebP do celular (até 5 MB), ou informe um link HTTPS.'
+        : 'Para uma foto nova, cole um link direto HTTPS ou um caminho já enviado ao GitHub em fotos/.')
       : 'Você pode atualizar esta lembrança sem alterar a foto original.');
   }
 
@@ -105,15 +110,18 @@
     mensagem('Não foi possível visualizar a foto. Confira se o endereço abre uma imagem.', true);
   });
   botaoSalvar.disabled = !config.armazenamentoDisponivel;
-  botaoLimpar.disabled = !config.armazenamentoDisponivel;
+  botaoLimpar.disabled = !config.armazenamentoDisponivel || Boolean(nuvem?.enabled);
   preencherFormulario();
   if (!config.armazenamentoDisponivel) {
     mensagem('Este navegador bloqueia o armazenamento local. Ainda é possível baixar as memórias publicadas.', true);
   }
 
-  formulario.addEventListener('submit', evento => {
+  formulario.addEventListener('submit', async evento => {
     evento.preventDefault();
-    if (!config.armazenamentoDisponivel) return;
+    if (!config.armazenamentoDisponivel) {
+      mensagem('O serviço de edição está indisponível. Tente novamente quando a nuvem estiver conectada.', true);
+      return;
+    }
 
     const nova = seletor.value === 'nova';
     const indice = nova ? registros.length : Number(seletor.value);
@@ -121,7 +129,12 @@
     const data = campoData.value.trim();
     const relato = campoRelato.value.trim();
     const fonte = campoFoto.value.trim();
+    const arquivo = campoArquivo?.files?.[0] || null;
 
+    if (arquivo && !nuvem?.enabled) {
+      mensagem('Envio direto de fotos só está disponível com o Supabase configurado.', true);
+      return;
+    }
     if (!Number.isInteger(indice) || indice < 0 || indice >= config.limiteFotos) {
       mensagem('Você chegou ao limite de fotos do álbum.', true);
       return;
@@ -134,8 +147,8 @@
       mensagem('Use uma data válida no formato ano-mês-dia.', true);
       return;
     }
-    if (!validarFoto(fonte)) {
-      mensagem('Use um link direto HTTPS para a imagem ou um arquivo da pasta fotos/.', true);
+    if (!arquivo && !validarFoto(fonte)) {
+      mensagem('Use um link HTTPS, um arquivo da pasta fotos/ ou selecione uma foto no celular.', true);
       return;
     }
 
@@ -146,6 +159,19 @@
       relato,
       src: fonte
     };
+    if (nuvem?.enabled) {
+      botaoSalvar.disabled = true;
+      try {
+        await nuvem.saveMemory(memoria, arquivo);
+        mensagem('Memória sincronizada na nuvem. Atualizando o álbum…');
+        window.location.reload();
+      } catch (erro) {
+        mensagem(erro.message || 'Não foi possível salvar na nuvem.', true);
+      } finally {
+        botaoSalvar.disabled = false;
+      }
+      return;
+    }
     const edicoes = carregarEdicoes().filter(item => item.fotoIndice !== indice);
     edicoes.push(memoria);
     edicoes.sort((a, b) => a.fotoIndice - b.fotoIndice);
