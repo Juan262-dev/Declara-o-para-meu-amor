@@ -44,10 +44,14 @@
   let extras;
   try {
     const salvo = window.localStorage.getItem(STORAGE_KEY);
-    extras = salvo ? normalizarExtras(JSON.parse(salvo)) : normalizarExtras(publicados);
+    extras = salvo ? normalizarExtras(JSON.parse(salvo)) : normalizarExtras({
+      bilhetes: [],
+      musica: publicados.musica,
+      sonhos: publicados.sonhos
+    });
   } catch (_) {
     armazenamentoDisponivel = false;
-    extras = normalizarExtras(publicados);
+    extras = normalizarExtras({ bilhetes: [], musica: publicados.musica, sonhos: publicados.sonhos });
   }
 
   function aviso(elemento, mensagem, erro = false) {
@@ -117,7 +121,7 @@
   let ultimoBilhete = -1;
 
   function sortearBilhete() {
-    const todos = [...bilhetesBase, ...extras.bilhetes];
+    const todos = [...new Set([...bilhetesBase, ...extras.bilhetes])];
     if (!todos.length) {
       bilheteVisivel.textContent = 'Adicione um bilhetinho para começar este pote.';
       return;
@@ -145,11 +149,12 @@
       apagar.textContent = 'Remover';
       apagar.setAttribute('aria-label', 'Remover bilhete: ' + mensagem);
       apagar.addEventListener('click', () => {
-        extras.bilhetes.splice(indice, 1);
+        const removido = extras.bilhetes.splice(indice, 1)[0];
         if (salvar()) {
           aviso(statusBilhetes, 'Bilhete removido deste aparelho.');
           renderizarBilhetes();
         } else {
+          extras.bilhetes.splice(indice, 0, removido);
           aviso(statusBilhetes, 'Não foi possível salvar neste aparelho.', true);
         }
       });
