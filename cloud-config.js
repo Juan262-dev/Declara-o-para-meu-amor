@@ -1,5 +1,6 @@
-// Configuração PÚBLICA: adicione aqui somente a URL do projeto Supabase.
-// Não é necessário colocar chave secret, service_role ou código de edição.
+// Configuração PÚBLICA do Supabase: URL e chave publishable NÃO são segredos.
+// Nunca inclua chaves secret/service_role, senhas ou códigos pessoais neste arquivo.
 window.albumCloudConfig = Object.freeze({
-  projectUrl: "https://jfedjtdyjpvqzetlexuf.supabase.co"
+  projectUrl: "https://jfedjtdyjpvqzetlexuf.supabase.co",
+  publishableKey: "sb_publishable_2YvaoJf1XSy5T5DgwbXEkw_ZfrIBE5L"
 });
