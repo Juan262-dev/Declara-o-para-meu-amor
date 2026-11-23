@@ -49,7 +49,11 @@
 
   const edicoes = new Map();
   let armazenamentoDisponivel = true;
-  try {
+  // Com nuvem configurada, nada salvo localmente deve esconder o último
+  // dado sincronizado por outro celular.
+  if (window.albumCloud?.enabled) {
+    armazenamentoDisponivel = window.albumCloud.online;
+  } else try {
     const texto = window.localStorage.getItem(STORAGE_KEY);
     if (texto && texto.length <= 100000) {
       const dados = JSON.parse(texto);
