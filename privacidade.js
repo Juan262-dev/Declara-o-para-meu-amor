@@ -5,6 +5,7 @@
 
   const config = window.albumEditorConfig;
   const experiencias = window.albumExperiencias;
+  const nuvem = window.albumCloud;
   const get = id => document.getElementById(id);
   if (!config || !experiencias || !get('baixarBackup')) return;
 
@@ -123,7 +124,9 @@
       new Set([...(Array.isArray(publicados.bilhetes) ? publicados.bilhetes : []), ...extras.bilhetes]).size +
       ' bilhetes no total, ' + extras.sonhos.length +
       ' sonhos e ' + (extras.musica.url ? 'um link de música' : 'nenhum link de música') +
-      '. Só os arquivos que você enviar ao GitHub serão publicados.';
+      (nuvem?.enabled
+        ? '. No modo nuvem, alterações salvas são públicas para visitantes do álbum.'
+        : '. Só os arquivos que você enviar ao GitHub serão publicados.');
   }
   atualizarResumo();
 
@@ -181,7 +184,9 @@
     const arquivo = inputBackup.files?.[0];
     if (!arquivo) return;
     if (!config.armazenamentoDisponivel || !experiencias.armazenamentoDisponivel) {
-      mostrarStatus('Este navegador não permite guardar os dados restaurados.', true);
+      mostrarStatus(nuvem?.enabled
+        ? 'A nuvem está indisponível: reconecte antes de restaurar o backup.'
+        : 'Este navegador não permite guardar os dados restaurados.', true);
       inputBackup.value = '';
       return;
     }
@@ -201,6 +206,18 @@
         inputBackup.value = '';
         return;
       }
+      if (nuvem?.enabled) {
+        if (!nuvem.online) throw new Error('A nuvem está indisponível. O backup não foi restaurado.');
+        // Cada gravação é verificada pelo servidor, usando o código de edição.
+        // Se a conexão cair no meio, parte do backup poderá já ter sido aplicada.
+        mostrarStatus('Restaurando backup na nuvem. Não feche esta página…');
+        for (const memoria of memorias) await nuvem.saveMemory(memoria);
+        await nuvem.saveExtras(extras);
+        mostrarStatus('Backup sincronizado na nuvem. Atualizando o álbum…');
+        window.location.reload();
+        return;
+      }
+
       const anteriorMemorias = window.localStorage.getItem(config.storageKey);
       const anteriorExtras = window.localStorage.getItem(experiencias.storageKey);
       try {
