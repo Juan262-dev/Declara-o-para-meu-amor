@@ -122,7 +122,10 @@ function chaveServidor() {
   if (antiga) return antiga;
   try {
     const novas = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
-    return Deno.env.get(novas.default) || "";
+    const chaveOuNome = typeof novas.default === "string" ? novas.default : "";
+    return chaveOuNome.startsWith("sb_secret_")
+      ? chaveOuNome
+      : (Deno.env.get(chaveOuNome) || "");
   } catch { return ""; }
 }
 
