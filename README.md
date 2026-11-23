@@ -31,7 +31,7 @@ O plano das próximas etapas está em [ROADMAP.md](ROADMAP.md).
 - `editor.js`: formulário acessível, exportação de `memorias.js` e opção para limpar alterações locais.
 - `app.js`: capítulos, galeria ampliada, cronômetros e surpresa.
 
-Abra o `index.html` no navegador ou publique os arquivos juntos no GitHub Pages. Os scripts `memorias.js` e `app.js` precisam estar na mesma pasta.
+Abra o `index.html` no navegador ou publique os arquivos juntos no GitHub Pages. Os scripts `memorias.js`, `album-data.js`, `app.js` e `editor.js` precisam estar na mesma pasta.
 
 ## Como adicionar histórias reais às fotos
 
