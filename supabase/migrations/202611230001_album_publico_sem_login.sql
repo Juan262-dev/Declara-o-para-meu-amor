@@ -33,36 +33,7 @@ grant all on public.amor_extras to service_role;
 -- O valor do hash NÃO está no repositório público; configure-o no Supabase.
 create table if not exists public.amor_edicao (
   id integer primary key default 1 check (id = 1),
-  codigo_hash text not null check (codigo_hash ~ '^[a-f0-9]{64}
--- ON CONFLICT DO NOTHING: nunca substitui dados criados depois.
-insert into public.amor_memorias(foto_indice, src, legenda, data, relato)
-values
-  (0, 'https://i.imgur.com/zKPMj1z.jpg', 'Nossa lembrança linda ✨', '2026-09-28', 'Um dia antes do aniversário do meu amor'),
-  (1, 'https://i.imgur.com/X6tkfUY.jpg', 'Meu grudinho pra vida toda 👩‍❤️‍👨', '2026-09-30', 'um dia apos o pedido oficial de namoro'),
-  (2, 'https://i.imgur.com/2KKbZUp.jpg', 'Te amo hoje e sempre ❤️', null, ''),
-  (3, 'fotos/lembranca-04.webp', 'Nosso registro em filme ♡', null, ''),
-  (4, 'fotos/lembranca-05.webp', 'Outro registro em filme ♡', null, '')
-on conflict (foto_indice) do nothing;
-
-insert into public.amor_extras(id, bilhetes, musica, sonhos)
-values (1,
-  '["Eu te amo demais! ❤️","Te amo hoje e sempre ❤️","Cada segundo ao teu lado é um presente.","Meu grudinho pra vida toda 👩‍❤️‍👨","E a nossa história continua sendo escrita… ✿"]'::jsonb,
-  '{"titulo":"","url":""}'::jsonb,
-  '[]'::jsonb)
-on conflict (id) do nothing;
-
--- Storage público porque o site não terá login: qualquer pessoa com a URL pode ver imagens.
--- Os visitantes NÃO recebem permissão para enviar, substituir ou apagar fotos.
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values (
-  'amor-fotos-publicas', 'amor-fotos-publicas', true, 5242880,
-  array['image/jpeg','image/png','image/webp']
-)
-on conflict (id) do nothing;
-
--- NÃO criar políticas em storage.objects para anon/authenticated; os uploads
--- serão autenticados pelo código de edição verificado na Edge Function.
-)
+  codigo_hash text not null check (codigo_hash ~ '^[a-f0-9]{64}$')
 );
 alter table public.amor_edicao enable row level security;
 revoke all on public.amor_edicao from public, anon, authenticated;
