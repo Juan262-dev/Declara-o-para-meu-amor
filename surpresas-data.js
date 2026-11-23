@@ -6,7 +6,8 @@ window.albumSurpresas = Object.freeze({
     "Te amo hoje e sempre ❤️",
     "Cada segundo ao teu lado é um presente.",
     "Meu grudinho pra vida toda 👩‍❤️‍👨",
-    "E a nossa história continua sendo escrita… ✿"
+    "E a nossa história continua sendo escrita… ✿",
+    "eu sei que eu não sou o melhor namorado, mas saiba que eu te amo muito e sempre vou te amar, quero sempre esta ao seu lado e te amando sempre, quero esta com vc nos piores e melhores momentos, eu te amoooooooooooooooo muitooooooooooooooooooooooooooooooo muitooooooooooooooooooooooooooooooo maaaaaaaaaaaaaaaaaaaaaaaaaiiiiiiiiiiiiiiiiiiiiissssssssss❤️❤️❤️❤️!!!!"
   ]),
   musica: Object.freeze({ titulo: "", url: "" }),
   sonhos: Object.freeze([])
