@@ -1,0 +1,4 @@
+# Função pública de leitura, escrita protegida por código de edição.
+# IMPORTANTE: este endpoint NÃO tem login e os dados lidos são públicos.
+[functions.album-sync]
+verify_jwt = false
