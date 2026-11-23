@@ -2,24 +2,28 @@
 
 Um álbum de memórias romântico, com visual de livro e conteúdo real. Feito com HTML, CSS e JavaScript, sem dependências na página.
 
-## Sincronização Supabase SEM LOGIN (nova integração)
+## Sincronização Supabase SEM LOGIN e SEM CÓDIGO (proposta de atualização)
+
+**Status da mudança:** o código foi preparado em uma branch de revisão. A função atualmente publicada pode continuar exigindo o código anterior até que a nova função seja implantada junto com o site. A migração de limites já foi instalada no Supabase.
+
+**Proteção contra excesso de uso:** até 30 edições a cada 15 minutos, 4 fotos por hora e 8 fotos por 24 horas, para todos os visitantes somados. Faça backups JSON e guarde os originais das imagens fora do site.
 
 O projeto Supabase **App do Meu Amor** (`jfedjtdyjpvqzetlexuf`) já foi criado em São Paulo e o banco, Storage e a função `album-sync` já estão configurados. A URL do projeto foi incluída em `cloud-config.js` nesta branch. **A versão publicada do GitHub Pages ainda não foi alterada**, pois o PR #8 aguarda revisão e merge. Consulte **[SUPABASE-SETUP.md](SUPABASE-SETUP.md)** para os detalhes.
 
 - **Visualizar:** qualquer pessoa com o endereço do site pode ver as memórias.
-- **Editar:** o aplicativo pede um código longo somente quando alguém tenta alterar dados. O código é verificado na Edge Function, nunca fica no GitHub.
+- **Editar:** qualquer visitante poderá salvar fotos, datas, relatos, bilhetes e sonhos sem login e sem código. **Isso permite edições indesejadas por desconhecidos.**
 - **Sincronizar:** na versão conectada ao Supabase, salvar uma memória, bilhete, música ou sonho envia a alteração à nuvem. Outros celulares veem a nova versão ao abrir/atualizar a página e recebem um aviso se surgirem novidades.
 - **Enviar fotos:** com a nuvem ativa, é possível escolher JPG, PNG ou WebP de até 5 MB diretamente no celular. As imagens vão para um bucket **público**.
 - **Sem nuvem:** o editor continua funcionando localmente, com exportação manual de arquivos.
 - **Sem autenticação de contas:** não há área privada de leitura. A RLS impede acesso direto às tabelas, mas a Edge Function disponibiliza leitura pública por decisão do produto. **Não publique informações pessoais que devam ficar secretas.**
 
-Arquivos novos: `cloud-config.js`, `cloud-bootstrap.js`, `supabase/functions/album-sync/index.ts`, `supabase/migrations/202611230001_album_publico_sem_login.sql` e `SUPABASE-SETUP.md`. **Não publique o código de edição nem chaves de servidor.**
+Arquivos da integração: `cloud-config.js`, `cloud-bootstrap.js`, `supabase/functions/album-sync/index.ts`, `supabase/migrations/202611230001_album_publico_sem_login.sql`, `supabase/migrations/202611230002_limites_edicao_publica.sql` e `SUPABASE-SETUP.md`. **Não publique chaves secretas do servidor.**
 
 ## Upgrade completo — Etapa 1: editor de memórias
 
 A seção **Editar memórias** permite atualizar legendas, datas, relatos e links das fotografias. Com Supabase configurado, também envia fotos diretamente do celular (JPG, PNG ou WebP, até 5 MB). Sem nuvem, aceita somente URLs HTTPS ou arquivos já presentes em `fotos/`.
 
-**Salvar** envia alterações à nuvem quando ela está ativa e pede um código longo para editar, sem exigir login. No modo local, guarda apenas no navegador e oferece o download de `memorias.js` para publicação manual. O botão **Descartar minhas alterações locais** funciona somente no modo local.
+**Salvar** envia alterações à nuvem quando ela está ativa, sem login e sem código de edição. No modo local, guarda apenas no navegador e oferece o download de `memorias.js` para publicação manual. O botão **Descartar minhas alterações locais** funciona somente no modo local.
 
 As fotos e mensagens publicadas continuam no app. Novas imagens e relatos enviados ao repositório público também ficam públicos, então confira antes de publicar.
 
@@ -38,7 +42,7 @@ A branch de revisão também inclui:
 - **Restauração:** opção para importar o JSON e repor dados locais ou enviar as memórias à nuvem (quando configurada) após confirmação.
 - **Publicação consciente:** botão para baixar `memorias.js` e `surpresas-data.js`, desbloqueado só depois de confirmar que o repositório é público. A substituição no GitHub é **manual**.
 
-Quando o Supabase estiver configurado, as alterações feitas no editor e nas surpresas ficam disponíveis aos visitantes e entre aparelhos, mediante o código de edição para salvar. Sem nuvem, continuam locais. O repositório permanece público, assim como a leitura de dados do endpoint. **Não existe proteção privada de acesso às fotos publicadas.** Consulte [ROADMAP.md](ROADMAP.md) para os detalhes.
+Com o Supabase conectado, as alterações feitas no editor e nas surpresas ficam disponíveis aos visitantes e entre aparelhos, sem autorização para editar. Sem nuvem, continuam locais. O repositório permanece público, assim como a leitura de dados do endpoint. **Não existe proteção privada de acesso às fotos publicadas.** Consulte [ROADMAP.md](ROADMAP.md) para os detalhes.
 
 ## O que há no aplicativo
 
@@ -56,7 +60,7 @@ Quando o Supabase estiver configurado, as alterações feitas no editor e nas su
 - `styles.css`: aparência delicada, livro, responsividade e acessibilidade.
 - `memorias.js`: dados publicados, incluindo datas, relatos e, opcionalmente, legenda e endereço para imagens adicionais. As fotos 1 e 2 têm datas e relatos; as outras três permanecem sem esses detalhes.
 - `cloud-config.js`: URL pública do projeto Supabase (sem segredos).
-- `cloud-bootstrap.js`: carrega dados da nuvem antes de renderizar a galeria e prepara a gravação protegida.
+- `cloud-bootstrap.js`: carrega dados da nuvem antes de renderizar a galeria e envia gravações sem exigir código.
 - `album-data.js`: prepara a galeria, usando dados remotos no modo nuvem ou edições locais no modo sem nuvem.
 - `editor.js`: formulário acessível, exportação de `memorias.js` e opção para limpar alterações locais.
 - `surpresas-data.js`: bilhetes do álbum e conteúdo público configurável de música e sonhos.
@@ -92,7 +96,7 @@ Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. 
 - As três fotografias originais continuam hospedadas no Imgur. Caso os links parem de funcionar, coloque os arquivos no repositório e substitua os caminhos. O repositório é público: confirme a privacidade de qualquer nova foto ou lembrança antes de enviá-la.
 - Google Fonts é opcional; há fontes alternativas caso não carregue.
 - A galeria pode ser fechada pelo botão de fechar ou pela tecla Esc, e as setas do teclado passam entre as fotos.
-- Sem Supabase, o editor guarda somente texto e links no armazenamento local, sujeito à limpeza do navegador. Com Supabase, envia imagens à nuvem, mas **a leitura continua pública** e alterações exigem um código longo.
+- Sem Supabase, o editor guarda somente texto e links no armazenamento local, sujeito à limpeza do navegador. Com Supabase, envia imagens à nuvem, mas **tanto a leitura quanto a edição ficam públicas**. Limites globais de gravação reduzem abuso, mas não protegem as lembranças contra vandalismo.
 
 ## Novas fotografias
 

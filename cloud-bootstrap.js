@@ -1,5 +1,5 @@
 // Carregador do álbum: usa dados do Supabase quando o projeto está configurado.
-// Não exige login. Para editar, pede um código longo conferido NO SERVIDOR.
+// Não exige login nem código para visualizar ou editar. A escrita pública é limitada pelo servidor.
 (async () => {
   'use strict';
 
@@ -7,7 +7,6 @@
   const url = typeof config.projectUrl === 'string' ? config.projectUrl.trim().replace(/\/+$/, '') : '';
   const valido = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url);
   const endpoint = valido ? url + '/functions/v1/album-sync' : '';
-  let codigo = '';
   let assinaturaRemota = '';
   const status = document.getElementById('cloudConnectionStatus');
   const aviso = document.getElementById('cloudNewData');
@@ -51,19 +50,9 @@
     if (!nuvem.enabled || !nuvem.online) {
       throw new Error('A nuvem está indisponível. Não foi feita nenhuma alteração.');
     }
-    if (!codigo) {
-      const digitado = window.prompt(
-        'Código de edição do álbum (não é login). Ele só é necessário para fazer alterações:'
-      );
-      if (digitado === null) throw new Error('Edição cancelada.');
-      codigo = digitado.trim();
-    }
-    if (codigo.length < 24) {
-      codigo = '';
-      throw new Error('O código de edição deve ter pelo menos 24 caracteres.');
-    }
-
-    const cabecalhos = { 'x-album-edit-code': codigo };
+    // Nenhum código, token de edição ou login solicitado ao visitante.
+    // O servidor ainda valida os dados e limita a frequência das gravações.
+    const cabecalhos = {};
     let corpo;
     if (arquivo) {
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(arquivo.type) ||
@@ -84,7 +73,6 @@
       cache: 'no-store',
     });
     const recebido = await resposta.json().catch(() => ({}));
-    if (resposta.status === 403) codigo = '';
     if (!resposta.ok) throw new Error(recebido.erro || 'Não foi possível sincronizar.');
     return recebido;
   }
@@ -111,7 +99,7 @@
         window.albumSurpresas = remotos.extras;
         assinaturaRemota = JSON.stringify(remotos);
         nuvem.online = true;
-        informar('☁ Lembranças sincronizadas. Sem login; código só para editar.');
+        informar('☁ Lembranças sincronizadas. Sem login nem código de edição.');
       } catch (_erro) {
         informar('Nuvem indisponível. Exibindo cópia publicada; edição desativada até reconectar.', true);
       }

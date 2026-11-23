@@ -1,5 +1,5 @@
 // Etapa 4: backup, restauração e publicação assistida.
-// GitHub Pages NÃO protege conteúdos publicados. Nada é enviado automaticamente.
+// GitHub Pages não protege conteúdo publicado; no modo nuvem, salva automaticamente.
 (() => {
   'use strict';
 
@@ -208,7 +208,7 @@
       }
       if (nuvem?.enabled) {
         if (!nuvem.online) throw new Error('A nuvem está indisponível. O backup não foi restaurado.');
-        // Cada gravação é verificada pelo servidor, usando o código de edição.
+        // Cada gravação é validada e limitada pelo servidor, sem código de edição.
         // Se a conexão cair no meio, parte do backup poderá já ter sido aplicada.
         mostrarStatus('Restaurando backup na nuvem. Não feche esta página…');
         for (const memoria of memorias) await nuvem.saveMemory(memoria);

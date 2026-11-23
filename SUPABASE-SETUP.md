@@ -1,67 +1,53 @@
-# Supabase sem login — integração do App do Meu Amor
+# Integração Supabase — App do Meu Amor (sem login e sem código de edição)
 
-## Configuração atual (23/11/2026)
+## Ambiente já configurado
 
-- Organização: **App do meu amor**
-- Projeto: **App do Meu Amor** (`jfedjtdyjpvqzetlexuf`)
-- Região: **São Paulo, Brasil** (`sa-east-1`)
-- URL: `https://jfedjtdyjpvqzetlexuf.supabase.co`
-- Banco e armazenamento: **criados**, com as 5 fotos originais e os 2 relatos informados.
-- Edge Function `album-sync`: **publicada**, com `verify_jwt=false` (sem login).
-- Código forte de edição: **configurado no banco como hash SHA-256**, nunca armazenado em texto aberto no GitHub.
-- `cloud-config.js`: configurado com a URL do projeto.
-- **GitHub Pages:** mudanças ainda numa branch e PR #8, aguardando merge/autorização para publicação.
-- Teste de ponta a ponta do endpoint no navegador real: pendente.
+- Projeto: **App do Meu Amor**, Supabase `jfedjtdyjpvqzetlexuf`, região São Paulo.
+- URL pública da API: `https://jfedjtdyjpvqzetlexuf.supabase.co`.
+- PostgreSQL com as cinco fotografias originais e dois relatos com datas.
+- Edge Function `album-sync`, configurada com `verify_jwt = false`.
+- Bucket `amor-fotos-publicas` para arquivos JPG, PNG e WebP de até 5 MB.
+- Migração `album_publico_sem_login` instalada.
+- Migração `limites_edicao_publica` instalada para conter parte dos abusos.
 
-## Como funciona
+## Mudança desta branch
 
-O álbum não exige login e **as lembranças são públicas para visualização**. Os dados são carregados pela Edge Function por HTTPS.
+**Nenhum visitante precisa de login, senha ou código para ler ou editar.** Qualquer pessoa que conseguir abrir o site poderá adicionar e alterar fotos, legendas, datas, relatos, bilhetes, o link da música e os sonhos. Quem alterar uma lembrança estará alterando a versão que todos veem. Isso foi solicitado explicitamente pelo responsável pelo álbum.
 
-Para editar fotos, datas, relatos, música, bilhetes ou sonhos, o aplicativo pede **um código de edição longo**. Esse código é verificado na Edge Function comparando seu hash SHA-256 ao valor armazenado em `public.amor_edicao`. A chave secreta do Supabase existe apenas no ambiente de execução da função.
+A função e o site ainda precisam ser publicados juntos, depois da aprovação do PR desta branch. Até essa publicação, a função atual em produção pode continuar pedindo o código antigo.
 
-### Quem pode acessar?
+## Como a segurança funciona agora
 
-- **Ler:** qualquer pessoa com o link do álbum.
-- **Editar:** qualquer pessoa que saiba o código de edição.
-- **Enviar fotos:** quem souber o código de edição, usando JPG, PNG ou WebP com até 5 MB.
-- **Onde ficam as fotos:** bucket Supabase **público** `amor-fotos-publicas` (nunca trate como armazenamento privado).
+- A leitura e a escrita são públicas por meio da **Edge Function**, mas as tabelas do banco de dados **não** concedem operações diretas a `anon` ou `authenticated`.
+- A função confere formato das datas, textos, links, imagens e limites de tamanho antes de gravar.
+- A função usa uma chave de servidor injetada pelo Supabase: **nunca colocar chave secret ou service_role no GitHub nem no JavaScript do site**.
+- A função executa a RPC `amor_reservar_edicao` com papéis de servidor. A RPC não é executável pelo papel `anon`.
+- Limites **globais**, para todos os visitantes somados: até **30 edições a cada 15 minutos**, até **4 imagens por hora** e até **8 imagens por período de 24 horas**. Após atingir algum limite, o servidor responde HTTP 429. Isso reduz abusos, mas **não impede vandalismo ou acesso por scripts**.
+- A tabela antiga `amor_edicao` ainda armazena o hash do código de edição para eventual reversão. O novo endpoint não o consulta nem exige código.
 
-## Segurança
+## Como publicar sem interromper o site
 
-As tabelas `amor_memorias`, `amor_extras` e `amor_edicao` têm RLS ativada e não oferecem acesso direto a papéis `anon`/`authenticated`. Isso significa que todo o tráfego esperado passa pela Edge Function, cuja leitura é pública e cuja gravação exige o código.
+1. Verificar arquivos e fazer o merge do Pull Request correspondente na `main` somente com aprovação.
+2. Publicar a versão nova de `supabase/functions/album-sync/index.ts`, usando `verify_jwt = false`.
+3. Aguardar a atualização do GitHub Pages e testar o editor no celular e em outro dispositivo.
+4. Verificar que nenhum código é solicitado e que a limitação de uso funciona.
 
-O linter do Supabase pode apresentar `RLS Enabled No Policy`; isso é **intencional** porque nenhum visitante deve acessar as tabelas diretamente. A função usa uma chave de servidor injetada no ambiente pelo Supabase. **Nunca coloque essa chave no GitHub ou no navegador.**
+A migração da limitação já foi aplicada, o que não alterou a proteção por código da função que continua em produção.
 
-O código de edição tem 48 caracteres gerados aleatoriamente. A chave em texto aberto foi entregue diretamente ao responsável pelo álbum; **não** está neste repositório. Para alterá-la, gere uma nova sequência aleatória forte, calcule seu SHA-256 e atualize apenas o campo `codigo_hash` da linha `id=1` em `public.amor_edicao`. Não use PIN curto ou aniversário.
+## Regras de privacidade e recuperação
 
-## Arquivos da integração
+- **Álbum totalmente público:** qualquer pessoa com o link pode ver **e modificar** as memórias e surpresas.
+- **Sem área privada:** não compartilhe histórias ou fotos que não deveriam estar visíveis.
+- **Sem recuperação automática de versões:** faça backups JSON com frequência e guarde as fotos originais fora da nuvem.
+- Uma pessoa que edita pode sobrescrever dados de outra. Atualize a página para ver a última versão.
+- Se houver uso indevido, será necessário desativar temporariamente as gravações no servidor ou restaurar um backup.
+- Os limites de uso não distinguem pessoas e podem impedir temporariamente edições legítimas se alguém consumir a cota.
+- O repositório do GitHub e fotos já publicadas continuam acessíveis ao público.
 
-- `cloud-config.js`: URL pública do projeto.
-- `cloud-bootstrap.js`: carrega os dados remotos antes de iniciar a galeria.
-- `supabase/migrations/202611230001_album_publico_sem_login.sql`: esquema e dados iniciais, com inserções que não sobrescrevem memórias existentes.
-- `supabase/functions/album-sync/index.ts`: backend de leitura, edição e upload com código.
-- `supabase/config.toml`: configuração de função pública sem login.
-- `SUPABASE-SETUP.md`: este documento.
+## Arquivos
 
-## Antes e depois do merge
-
-A versão principal `main` não foi alterada pela configuração do Supabase. O PR #8 aplica as modificações de site e conecta a URL; o backend já foi criado no projeto Supabase.
-
-Depois do merge, verifique o aviso `Lembranças sincronizadas` no topo do site. Salvar uma memória envia uma gravação ao Supabase; no outro dispositivo, recarregue a página (ou use o aviso de atualização).
-
-O código de edição não é pedido para **ver** o álbum. Ele é solicitado apenas ao clicar em **Salvar**, e permanece na memória da página até que ela seja fechada ou atualizada.
-
-## Cuidados com lembranças antigas
-
-As cinco fotos e os relatos já publicados no GitHub foram inseridos no banco sem substituição de registros existentes. Se houver **alterações feitas somente no navegador antigo**, elas não são migradas automaticamente: faça um backup dessas edições antes de passar ao modo nuvem.
-
-Backups JSON armazenam **links e informações**, não o conteúdo binário das fotografias. Para manter cópias de fotos, guarde também os arquivos de imagem separadamente.
-
-## Limitações
-
-- Sem login, **não existe privacidade de leitura**. Imagens e relatos enviados à nuvem tornam-se públicos.
-- Não há histórico de versões nem distinção entre pessoas que possuem o mesmo código.
-- Se o código vazar, altere o hash cadastrado no banco.
-- Uma restauração de backup na nuvem é sequencial e pode ser parcial se houver falha na conexão.
-- A criação do projeto teve custo informado de US$ 0/mês, mas o uso e o armazenamento obedecem aos limites e preços do plano Supabase.
-- Testes funcionais automatizados não substituem uma conferência visual e uma chamada HTTP real ao serviço.
+- `cloud-config.js`: URL pública, não contém segredos.
+- `cloud-bootstrap.js`: cliente sem prompt de código.
+- `supabase/functions/album-sync/index.ts`: função pública com validação e limite.
+- `supabase/migrations/202611230002_limites_edicao_publica.sql`: proteção de abuso com função SQL `SECURITY INVOKER`.
+- `README.md` e `ROADMAP.md`: comportamento e versões.
