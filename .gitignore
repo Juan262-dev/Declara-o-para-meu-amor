@@ -1,0 +1,6 @@
+# Nunca publique segredos nem cópias das imagens pessoais por acidente.
+.env
+.env.*
+!.env.example
+supabase/functions/.env
+supabase/.branches
