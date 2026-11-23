@@ -156,7 +156,7 @@
     if (!chavePublica || !nuvem.online) return;
     try {
       // Dependência fixa para não mudar automaticamente entre implantações.
-      await script('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0/dist/umd/supabase.min.js');
+      await script('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0');
       if (!window.supabase || typeof window.supabase.createClient !== 'function') {
         throw new Error('Biblioteca Realtime indisponível.');
       }
