@@ -4,11 +4,11 @@ Um álbum de memórias romântico, com visual de livro e conteúdo real. Feito c
 
 ## Sincronização Supabase SEM LOGIN (nova integração)
 
-A integração com Supabase está **preparada no código**, mas **ainda não foi ativada**, porque a organização Supabase conectada não tinha nenhum projeto de banco disponível. Consulte **[SUPABASE-SETUP.md](SUPABASE-SETUP.md)** para ativar.
+O projeto Supabase **App do Meu Amor** (`jfedjtdyjpvqzetlexuf`) já foi criado em São Paulo e o banco, Storage e a função `album-sync` já estão configurados. A URL do projeto foi incluída em `cloud-config.js` nesta branch. **A versão publicada do GitHub Pages ainda não foi alterada**, pois o PR #8 aguarda revisão e merge. Consulte **[SUPABASE-SETUP.md](SUPABASE-SETUP.md)** para os detalhes.
 
 - **Visualizar:** qualquer pessoa com o endereço do site pode ver as memórias.
 - **Editar:** o aplicativo pede um código longo somente quando alguém tenta alterar dados. O código é verificado na Edge Function, nunca fica no GitHub.
-- **Sincronizar:** quando o Supabase estiver ativo, salvar uma memória, bilhete, música ou sonho envia a alteração à nuvem. Outros celulares veem a nova versão ao abrir/atualizar a página e recebem um aviso se surgirem novidades.
+- **Sincronizar:** na versão conectada ao Supabase, salvar uma memória, bilhete, música ou sonho envia a alteração à nuvem. Outros celulares veem a nova versão ao abrir/atualizar a página e recebem um aviso se surgirem novidades.
 - **Enviar fotos:** com a nuvem ativa, é possível escolher JPG, PNG ou WebP de até 5 MB diretamente no celular. As imagens vão para um bucket **público**.
 - **Sem nuvem:** o editor continua funcionando localmente, com exportação manual de arquivos.
 - **Sem autenticação de contas:** não há área privada de leitura. A RLS impede acesso direto às tabelas, mas a Edge Function disponibiliza leitura pública por decisão do produto. **Não publique informações pessoais que devam ficar secretas.**
