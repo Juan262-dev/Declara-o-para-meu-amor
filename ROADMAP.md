@@ -1,6 +1,6 @@
 # Upgrade completo — Nossa História Infinita ❤️
 
-Esta branch reúne as quatro etapas para revisão conjunta. O Pull Request fica em **rascunho**, sem merge na `main` antes da aprovação.
+As etapas anteriores já estão no aplicativo. As melhorias novas são preparadas em branches separadas para revisão antes da publicação.
 
 ## Etapa 1 — Editor de memórias (implementada)
 
@@ -55,15 +55,26 @@ Nenhum acontecimento ou data de fotografias foi inventado.
 - Sincroniza relatos, datas, legendas, bilhetes, música e sonhos entre aparelhos.
 - Verifica atualizações e oferece botão para recarregar, sem fechar o formulário automaticamente.
 - Backup/restauração podem ser usados também no modo nuvem.
-- **Backend configurado:** projeto Supabase `jfedjtdyjpvqzetlexuf` criado em São Paulo, tabelas e Storage implantados, função `album-sync` ativa, URL configurada na `main`. O modo de edição com código ainda é a versão publicada da função.
+- **Backend configurado:** projeto Supabase `jfedjtdyjpvqzetlexuf` criado em São Paulo, tabelas e Storage implantados, função `album-sync` ativa e URL configurada na `main`.
 - O PR #8 já foi integrado à `main`. A atualização visual do site depende da publicação do GitHub Pages.
 - **Limite de privacidade:** qualquer visitante pode ver as lembranças. O sistema NÃO oferece fotos privadas.
 
-## Etapa 6 — Edição pública sem código (preparada, aguardando publicação)
+## Etapa 6 — Edição pública sem código (integrada à main)
 
 - Remove o prompt e o cabeçalho de código do aplicativo.
 - Remove a exigência de código da Edge Function, mantendo validações no servidor.
 - Adiciona limites globais de 30 edições/15 min, 4 fotos/hora, 8 fotos/dia.
-- A migração do limitador já está instalada, mas a função de escrita sem código ainda não foi publicada.
+- A migração do limitador e a função sem código já estão publicadas no Supabase.
 - **Qualquer pessoa com o link poderá alterar memórias e surpresas**, sem recuperação automática de versões. Recomenda-se guardar backups atualizados.
-- Depois da aprovação do PR, publicar a função nova e a interface em conjunto.
+- PR #9 integrado; o servidor e a `main` estão sem exigência de código.
+
+
+## Etapa 7 — Notificações Realtime (preparadas para revisão)
+
+- Migração instalada: `amor_sinal` anuncia somente versões, sem expor fotos, textos ou outros dados nas notificações.
+- Gatilhos em `amor_memorias` e `amor_extras`; `supabase_realtime` publica apenas `amor_sinal`.
+- Frontend assina `postgres_changes`, busca conteúdo atualizado e recarrega a página automaticamente quando não há texto sendo editado.
+- Com formulário em uso, avisa e oferece botão para atualizar, sem descartar o texto automaticamente.
+- Plano B por consulta a cada 60 segundos, inclusive quando o serviço Realtime/CDN estiver indisponível.
+- Migração e 11 cenários de cliente testados; ainda é preciso testar com dois celulares reais após o merge do PR.
+- **Continua sem login nem código.** Qualquer visitante pode visualizar e editar.
