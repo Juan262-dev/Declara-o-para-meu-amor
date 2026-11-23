@@ -1,6 +1,6 @@
-// Endpoint público para LEITURA e protegido por código longo para ESCRITA.
-// Configure verify_jwt = false em supabase/config.toml.
-// Nunca envie a chave secreta do Supabase ou ALBUM_EDIT_TOKEN ao navegador/GitHub.
+// Endpoint público para leitura E escrita, sem login ou código.
+// Escritas passam por validação e limites no banco para reduzir abuso.
+// Nunca envie chave secreta do Supabase para o navegador ou GitHub.
 import { createClient } from "npm:@supabase/supabase-js@2.86.0";
 
 type Memoria = {
@@ -108,17 +108,6 @@ function assinaturaCorreta(bytes: Uint8Array, mime: string) {
   return false;
 }
 
-async function codigoCorreto(codigo: string, hashEsperado: string): Promise<boolean> {
-  if (!/^[a-f0-9]{64}$/.test(hashEsperado)) return false;
-  const bytes = new TextEncoder().encode(codigo);
-  const hashEnviado = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
-  let diferenca = 0;
-  for (let i = 0; i < hashEnviado.length; i++) {
-    diferenca |= hashEnviado[i] ^ Number.parseInt(hashEsperado.slice(i * 2, i * 2 + 2), 16);
-  }
-  return diferenca === 0;
-}
-
 function chaveServidor() {
   const antiga = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (antiga) return antiga;
@@ -143,7 +132,7 @@ Deno.serve(async (req: Request) => {
   const cors: Record<string, string> = {
     "Access-Control-Allow-Origin": restrita && origin === restrita ? restrita : (restrita || "*"),
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "content-type, x-album-edit-code",
+    "Access-Control-Allow-Headers": "content-type",
     "Vary": "Origin",
   };
 
@@ -177,20 +166,9 @@ Deno.serve(async (req: Request) => {
       }, 200, cors);
     }
 
-    // O código nunca fica no GitHub, no navegador ou em variáveis públicas.
-    // O projeto guarda apenas um hash SHA-256 de um código aleatório longo.
-    const enviado = req.headers.get("x-album-edit-code") || "";
-    if (enviado.length < 24 || enviado.length > 200) {
-      return json({ erro: "Código de edição incorreto." }, 403, cors);
-    }
-    const { data: configuracao, error: erroCodigo } = await supabase
-      .from("amor_edicao").select("codigo_hash").eq("id", 1).maybeSingle();
-    if (erroCodigo || !configuracao) {
-      return json({ erro: "Código de edição ainda não configurado no servidor." }, 503, cors);
-    }
-    if (!(await codigoCorreto(enviado, configuracao.codigo_hash))) {
-      return json({ erro: "Código de edição incorreto." }, 403, cors);
-    }
+    // Sem identificação do visitante: qualquer pessoa com o link pode editar.
+    // As tabelas continuam fechadas para anon/authenticated; apenas este endpoint
+    // valida e limita a frequência das operações antes de utilizar a chave do servidor.
 
     const tipo = req.headers.get("content-type") || "";
     let acao = "";
@@ -230,6 +208,16 @@ Deno.serve(async (req: Request) => {
         return json({ erro: "Adicione as fotos na sequência do álbum." }, 409, cors);
       }
 
+      // Limite global para reduzir vandalismo e custos. Sem login não há
+      // identificação confiável do visitante nem proteção completa contra abuso.
+      const { data: podeEditar, error: erroLimite } = await supabase.rpc(
+        "amor_reservar_edicao", { p_tipo: "escrita" }
+      );
+      if (erroLimite) throw new Error("Controle de edições indisponível.");
+      if (!podeEditar) return json({
+        erro: "Muitas edições em pouco tempo. Tente novamente mais tarde."
+      }, 429, cors);
+
       let arquivoEnviado: string | null = null;
       if (imagem) {
         if (!MIME[imagem.type] || imagem.size > MAX_BYTES || imagem.size < 16) {
@@ -238,6 +226,17 @@ Deno.serve(async (req: Request) => {
         const bytes = new Uint8Array(await imagem.arrayBuffer());
         if (!assinaturaCorreta(bytes, imagem.type)) {
           return json({ erro: "O conteúdo não corresponde ao formato da imagem." }, 400, cors);
+        }
+
+        // Buckets são públicos para leitura. Limite uploads para conter custos.
+        for (const limiteFoto of ["foto_hora", "foto_dia"]) {
+          const { data: podeEnviar, error: erroFoto } = await supabase.rpc(
+            "amor_reservar_edicao", { p_tipo: limiteFoto }
+          );
+          if (erroFoto) throw new Error("Controle de uploads indisponível.");
+          if (!podeEnviar) return json({
+            erro: "Limite de envio de fotos atingido. Tente novamente mais tarde."
+          }, 429, cors);
         }
         arquivoEnviado = crypto.randomUUID() + "." + MIME[imagem.type];
         const upload = await supabase.storage.from(BUCKET).upload(arquivoEnviado, bytes, {
@@ -261,6 +260,13 @@ Deno.serve(async (req: Request) => {
     if (acao === "salvar-extras") {
       const extras = normalizarExtras(corpo);
       if (!extras) return json({ erro: "Bilhetes, música ou sonhos inválidos." }, 400, cors);
+      const { data: podeEditar, error: erroLimite } = await supabase.rpc(
+        "amor_reservar_edicao", { p_tipo: "escrita" }
+      );
+      if (erroLimite) throw new Error("Controle de edições indisponível.");
+      if (!podeEditar) return json({
+        erro: "Muitas edições em pouco tempo. Tente novamente mais tarde."
+      }, 429, cors);
       const gravado = await supabase.from("amor_extras").upsert({
         id: 1, ...extras, atualizado_em: new Date().toISOString(),
       }, { onConflict: "id" });
