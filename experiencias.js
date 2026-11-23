@@ -5,6 +5,9 @@
 
   const STORAGE_KEY = 'nossa-historia-infinita-experiencias-v1';
   const publicados = window.albumSurpresas || { bilhetes: [], musica: {}, sonhos: [] };
+  const nuvem = window.albumCloud;
+  const onde = () => nuvem?.enabled ? 'na nuvem' : 'neste aparelho';
+  let ultimoErro = '';
   const maxBilhetes = 50;
   const maxSonhos = 50;
   const porId = id => document.getElementById(id);
@@ -42,7 +45,10 @@
 
   let armazenamentoDisponivel = true;
   let extras;
-  try {
+  if (nuvem?.enabled) {
+    armazenamentoDisponivel = nuvem.online;
+    extras = normalizarExtras(publicados);
+  } else try {
     const salvo = window.localStorage.getItem(STORAGE_KEY);
     extras = salvo ? normalizarExtras(JSON.parse(salvo)) : normalizarExtras({
       bilhetes: [],
@@ -60,12 +66,21 @@
     elemento.dataset.erro = erro ? 'true' : 'false';
   }
 
-  function salvar() {
-    if (!armazenamentoDisponivel) return false;
+  async function salvar() {
+    ultimoErro = '';
+    if (!armazenamentoDisponivel) {
+      ultimoErro = 'A edição está indisponível até a nuvem se reconectar.';
+      return false;
+    }
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(extras));
+      if (nuvem?.enabled) {
+        await nuvem.saveExtras(extras);
+      } else {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(extras));
+      }
       return true;
-    } catch (_) {
+    } catch (erro) {
+      ultimoErro = erro?.message || 'Não foi possível salvar.';
       return false;
     }
   }
@@ -109,7 +124,7 @@
   }
 
   // Um pote de bilhetes pessoais. As mensagens iniciais vêm do app.
-  const bilhetesBase = Array.isArray(publicados.bilhetes)
+  const bilhetesBase = nuvem?.enabled ? [] : Array.isArray(publicados.bilhetes)
     ? publicados.bilhetes.filter(item => typeof item === 'string').map(item => texto(item, 300)).filter(Boolean)
     : [];
   const bilheteVisivel = porId('bilheteSorteado');
@@ -148,14 +163,14 @@
       apagar.type = 'button';
       apagar.textContent = 'Remover';
       apagar.setAttribute('aria-label', 'Remover bilhete: ' + mensagem);
-      apagar.addEventListener('click', () => {
+      apagar.addEventListener('click', async () => {
         const removido = extras.bilhetes.splice(indice, 1)[0];
-        if (salvar()) {
-          aviso(statusBilhetes, 'Bilhete removido deste aparelho.');
+        if (await salvar()) {
+          aviso(statusBilhetes, 'Bilhete removido ' + onde() + '.');
           renderizarBilhetes();
         } else {
           extras.bilhetes.splice(indice, 0, removido);
-          aviso(statusBilhetes, 'Não foi possível salvar neste aparelho.', true);
+          aviso(statusBilhetes, ultimoErro, true);
         }
       });
       item.append(textoBilhete, apagar);
@@ -165,7 +180,7 @@
 
   if (botaoBilhete && formularioBilhete) {
     botaoBilhete.addEventListener('click', sortearBilhete);
-    formularioBilhete.addEventListener('submit', evento => {
+    formularioBilhete.addEventListener('submit', async evento => {
       evento.preventDefault();
       const mensagem = texto(campoBilhete.value, 300);
       if (!mensagem || extras.bilhetes.length >= maxBilhetes) {
@@ -173,14 +188,14 @@
         return;
       }
       extras.bilhetes.push(mensagem);
-      if (!salvar()) {
+      if (!(await salvar())) {
         extras.bilhetes.pop();
-        aviso(statusBilhetes, 'Este navegador não conseguiu salvar o bilhete.', true);
+        aviso(statusBilhetes, ultimoErro, true);
         return;
       }
       campoBilhete.value = '';
       renderizarBilhetes();
-      aviso(statusBilhetes, 'Bilhete guardado apenas neste aparelho.');
+      aviso(statusBilhetes, 'Bilhete guardado ' + onde() + '.');
     });
     renderizarBilhetes();
   }
@@ -208,7 +223,7 @@
   }
   if (formularioMusica) {
     mostrarMusica();
-    formularioMusica.addEventListener('submit', evento => {
+    formularioMusica.addEventListener('submit', async evento => {
       evento.preventDefault();
       const titulo = texto(campoTituloMusica.value, 110);
       const url = texto(campoUrlMusica.value, 1200);
@@ -222,13 +237,13 @@
       }
       const anterior = extras.musica;
       extras.musica = { titulo, url };
-      if (!salvar()) {
+      if (!(await salvar())) {
         extras.musica = anterior;
-        aviso(statusMusica, 'Não foi possível salvar a música no aparelho.', true);
+        aviso(statusMusica, ultimoErro, true);
         return;
       }
       mostrarMusica();
-      aviso(statusMusica, 'Cartão de música atualizado apenas neste aparelho.');
+      aviso(statusMusica, 'Cartão de música atualizado ' + onde() + '.');
     });
   }
 
@@ -247,17 +262,17 @@
       const check = document.createElement('input');
       check.type = 'checkbox';
       check.checked = sonho.concluido;
-      check.addEventListener('change', () => {
+      check.addEventListener('change', async () => {
         const antigo = sonho.concluido;
         sonho.concluido = check.checked;
-        if (!salvar()) {
+        if (!(await salvar())) {
           sonho.concluido = antigo;
           check.checked = antigo;
-          aviso(statusSonhos, 'Não foi possível guardar a atualização.', true);
+          aviso(statusSonhos, ultimoErro, true);
           return;
         }
         renderizarSonhos();
-        aviso(statusSonhos, 'Lista atualizada neste aparelho.');
+        aviso(statusSonhos, 'Lista atualizada ' + onde() + '.');
       });
       const titulo = document.createElement('span');
       titulo.textContent = sonho.titulo;
@@ -266,15 +281,15 @@
       apagar.type = 'button';
       apagar.textContent = 'Remover';
       apagar.setAttribute('aria-label', 'Remover sonho: ' + sonho.titulo);
-      apagar.addEventListener('click', () => {
+      apagar.addEventListener('click', async () => {
         const removido = extras.sonhos.splice(indice, 1)[0];
-        if (!salvar()) {
+        if (!(await salvar())) {
           extras.sonhos.splice(indice, 0, removido);
-          aviso(statusSonhos, 'Não foi possível guardar a remoção.', true);
+          aviso(statusSonhos, ultimoErro, true);
           return;
         }
         renderizarSonhos();
-        aviso(statusSonhos, 'Sonho removido da lista local.');
+        aviso(statusSonhos, 'Sonho removido ' + onde() + '.');
       });
       item.append(label, apagar);
       listaSonhos.append(item);
@@ -283,7 +298,7 @@
   }
 
   if (formularioSonho) {
-    formularioSonho.addEventListener('submit', evento => {
+    formularioSonho.addEventListener('submit', async evento => {
       evento.preventDefault();
       const titulo = texto(campoSonho.value, 140);
       if (!titulo || extras.sonhos.length >= maxSonhos) {
@@ -292,14 +307,14 @@
       }
       const novo = { id: String(Date.now()) + '-' + String(Math.floor(Math.random() * 100000)), titulo, concluido: false };
       extras.sonhos.push(novo);
-      if (!salvar()) {
+      if (!(await salvar())) {
         extras.sonhos.pop();
-        aviso(statusSonhos, 'Não foi possível salvar o sonho.', true);
+        aviso(statusSonhos, ultimoErro, true);
         return;
       }
       campoSonho.value = '';
       renderizarSonhos();
-      aviso(statusSonhos, 'Sonho adicionado neste aparelho.');
+      aviso(statusSonhos, 'Sonho adicionado ' + onde() + '.');
     });
     renderizarSonhos();
   }
