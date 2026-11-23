@@ -127,7 +127,11 @@
   }
   atualizarResumo();
 
+  // Estado seguro por padrão, inclusive se os botões forem criados sem o atributo disabled.
+  botaoMemorias.disabled = !confirmacao.checked;
+  botaoSurpresas.disabled = !confirmacao.checked;
   confirmacao.addEventListener('change', () => {
+    atualizarResumo();
     botaoMemorias.disabled = !confirmacao.checked;
     botaoSurpresas.disabled = !confirmacao.checked;
   });
