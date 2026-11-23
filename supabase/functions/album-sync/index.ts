@@ -108,13 +108,15 @@ function assinaturaCorreta(bytes: Uint8Array, mime: string) {
   return false;
 }
 
-async function igualSeguro(a: string, b: string): Promise<boolean> {
-  const bytes = new TextEncoder();
-  const [aHash, bHash] = await Promise.all([a, b].map(async s =>
-    new Uint8Array(await crypto.subtle.digest("SHA-256", bytes.encode(s)))));
-  let dif = 0;
-  for (let i = 0; i < aHash.length; i++) dif |= aHash[i] ^ bHash[i];
-  return dif === 0;
+async function codigoCorreto(codigo: string, hashEsperado: string): Promise<boolean> {
+  if (!/^[a-f0-9]{64}$/.test(hashEsperado)) return false;
+  const bytes = new TextEncoder().encode(codigo);
+  const hashEnviado = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  let diferenca = 0;
+  for (let i = 0; i < hashEnviado.length; i++) {
+    diferenca |= hashEnviado[i] ^ Number.parseInt(hashEsperado.slice(i * 2, i * 2 + 2), 16);
+  }
+  return diferenca === 0;
 }
 
 function chaveServidor() {
@@ -175,12 +177,19 @@ Deno.serve(async (req: Request) => {
       }, 200, cors);
     }
 
-    const segredo = Deno.env.get("ALBUM_EDIT_TOKEN") || "";
+    // O código nunca fica no GitHub, no navegador ou em variáveis públicas.
+    // O projeto guarda apenas um hash SHA-256 de um código aleatório longo.
     const enviado = req.headers.get("x-album-edit-code") || "";
-    // Um PIN curto NÃO basta. Configure um código aleatório com pelo menos 24 caracteres.
-    if (segredo.length < 24 || enviado.length < 24 || enviado.length > 200 ||
-        !(await igualSeguro(enviado, segredo))) {
-      return json({ erro: "Código de edição incorreto ou não configurado." }, 403, cors);
+    if (enviado.length < 24 || enviado.length > 200) {
+      return json({ erro: "Código de edição incorreto." }, 403, cors);
+    }
+    const { data: configuracao, error: erroCodigo } = await supabase
+      .from("amor_edicao").select("codigo_hash").eq("id", 1).maybeSingle();
+    if (erroCodigo || !configuracao) {
+      return json({ erro: "Código de edição ainda não configurado no servidor." }, 503, cors);
+    }
+    if (!(await codigoCorreto(enviado, configuracao.codigo_hash))) {
+      return json({ erro: "Código de edição incorreto." }, 403, cors);
     }
 
     const tipo = req.headers.get("content-type") || "";
