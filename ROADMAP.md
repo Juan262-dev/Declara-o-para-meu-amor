@@ -47,14 +47,23 @@ Esta branch reúne as quatro etapas para revisão conjunta. O Pull Request fica 
 
 Nenhum acontecimento ou data de fotografias foi inventado.
 
-## Etapa 5 — Sincronização em nuvem sem login (código pronto, ativação pendente)
+## Etapa 5 — Sincronização em nuvem sem login (integrada à main)
 
 - Criados os arquivos do banco PostgreSQL, Edge Function e Storage público no diretório `supabase/`.
-- O site carrega dados pelo endpoint público GET; os formulários salvam pelo POST com **código de edição longo**, verificado somente no servidor.
+- O site carrega dados pelo endpoint público GET e salva com POST. **A proposta da etapa 6 remove a exigência do código de edição**.
 - Upload de fotos JPG/PNG/WebP do celular até 5 MB.
 - Sincroniza relatos, datas, legendas, bilhetes, música e sonhos entre aparelhos.
 - Verifica atualizações e oferece botão para recarregar, sem fechar o formulário automaticamente.
 - Backup/restauração podem ser usados também no modo nuvem.
-- **Backend configurado:** projeto Supabase `jfedjtdyjpvqzetlexuf` criado em São Paulo, tabelas e Storage implantados, função `album-sync` ativa, URL configurada na branch e código de edição forte registrado apenas por hash.
-- **Pendente:** publicar esta branch no GitHub Pages por merge do PR #8 (com autorização), e realizar teste real de ponta a ponta no navegador.
-- **Limite da escolha sem login:** qualquer visitante pode ver as lembranças; somente a edição exige código. O sistema NÃO oferece fotos privadas.
+- **Backend configurado:** projeto Supabase `jfedjtdyjpvqzetlexuf` criado em São Paulo, tabelas e Storage implantados, função `album-sync` ativa, URL configurada na `main`. O modo de edição com código ainda é a versão publicada da função.
+- O PR #8 já foi integrado à `main`. A atualização visual do site depende da publicação do GitHub Pages.
+- **Limite de privacidade:** qualquer visitante pode ver as lembranças. O sistema NÃO oferece fotos privadas.
+
+## Etapa 6 — Edição pública sem código (preparada, aguardando publicação)
+
+- Remove o prompt e o cabeçalho de código do aplicativo.
+- Remove a exigência de código da Edge Function, mantendo validações no servidor.
+- Adiciona limites globais de 30 edições/15 min, 4 fotos/hora, 8 fotos/dia.
+- A migração do limitador já está instalada, mas a função de escrita sem código ainda não foi publicada.
+- **Qualquer pessoa com o link poderá alterar memórias e surpresas**, sem recuperação automática de versões. Recomenda-se guardar backups atualizados.
+- Depois da aprovação do PR, publicar a função nova e a interface em conjunto.
