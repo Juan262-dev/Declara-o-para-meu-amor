@@ -16,7 +16,7 @@
   const botaoAtualizar = document.getElementById('cloudUpdateButton');
 
   let assinaturaRemota = '';
-  let editando = false;
+  const formulariosPendentes = new Set();
   let verificando = false;
   let verificacaoPendente = false;
   let avisoPendente = false;
@@ -98,12 +98,35 @@
   window.albumCloud = nuvem;
 
   function usuarioPreenchendo() {
-    // Não recarregar se há texto não salvo, arquivo escolhido ou campo em foco.
-    const campoAtivo = document.activeElement;
-    const focado = campoAtivo && typeof campoAtivo.closest === 'function'
-      && campoAtivo.closest('form, [contenteditable="true"]');
-    return editando || Boolean(focado);
+    // Somente alterações realmente pendentes impedem atualização automática.
+    // Um campo com foco, mas sem alterações, não bloqueia a sincronização.
+    return formulariosPendentes.size > 0;
   }
+
+  function formularioModificado(evento) {
+    const elemento = evento.target;
+    if (!elemento || typeof elemento.closest !== 'function') return;
+    const formulario = elemento.closest('form');
+    if (!formulario) return;
+    // Selecionar outra foto apenas muda a visualização do editor.
+    if (elemento.id === 'editarEscolhaFoto') {
+      formulariosPendentes.delete(formulario);
+      return;
+    }
+    formulariosPendentes.add(formulario);
+    if (avisoPendente) apresentarNovidades();
+  }
+
+  function formularioSalvo(formulario) {
+    if (!formulario) return;
+    formulariosPendentes.delete(formulario);
+    // Assim que o último rascunho for salvo, aplica as novidades recebidas.
+    if (avisoPendente && !usuarioPreenchendo()) {
+      avisoPendente = false;
+      void verificarNovidades();
+    }
+  }
+  nuvem.formSaved = formularioSalvo;
 
   function recarregarPreservandoPosicao() {
     try {
@@ -230,12 +253,10 @@
         recarregarPreservandoPosicao();
       });
 
-      document.addEventListener('input', evento => {
-        const elemento = evento.target;
-        if (elemento && typeof elemento.closest === 'function' && elemento.closest('form')) {
-          editando = true;
-          if (avisoPendente) apresentarNovidades();
-        }
+      document.addEventListener('input', formularioModificado);
+      document.addEventListener('change', formularioModificado);
+      document.addEventListener('reset', evento => {
+        if (evento.target) formularioSalvo(evento.target);
       });
 
       document.addEventListener('visibilitychange', () => {
