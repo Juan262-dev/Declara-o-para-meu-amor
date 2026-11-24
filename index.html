@@ -10,9 +10,14 @@
   <meta property="og:type" content="website">
   <title>Nossa História Infinita ❤️ | Para o meu amor</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="assets/icone-app.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Nosso Amor">
   <!-- Scripts do álbum carregam na sequência depois de buscar dados na nuvem. -->
   <script src="cloud-config.js?v=realtime-1" defer></script>
-  <script src="cloud-bootstrap.js?v=realtime-1" defer></script>
+  <script src="cloud-bootstrap.js?v=celular-1" defer></script>
+  <script src="pwa.js?v=celular-1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -38,6 +43,10 @@
 
   <div class="cloud-status-bar" role="status" aria-live="polite">
     <span id="cloudConnectionStatus">Iniciando álbum…</span>
+  </div>
+  <div class="install-app-bar">
+    <button id="instalarApp" class="button button-outline button-small" type="button">♡ Adicionar à tela inicial</button>
+    <span id="instalarAppStatus" role="status" aria-live="polite">Abra como aplicativo no celular. Offline, você pode consultar a cópia publicada do álbum.</span>
   </div>
   <div class="cloud-update-banner" id="cloudNewData" hidden>
     <span>♡ Existem lembranças novas na nuvem.</span>
@@ -238,7 +247,7 @@
                 <div class="editor-field">
                   <label for="editarArquivoFoto">Foto do celular (opcional, somente no modo nuvem)</label>
                   <input type="file" id="editarArquivoFoto" name="arquivo" accept="image/jpeg,image/png,image/webp">
-                  <small>JPG, PNG ou WebP, até 5 MB. Após salvar, a imagem ficará publicamente acessível no álbum.</small>
+                  <small>JPG, PNG ou WebP. Fotos grandes são reduzidas no próprio celular antes do envio (limite final de 5 MB). A imagem salva fica pública no álbum; o original não é alterado.</small>
                 </div>
                 <div class="editor-actions">
                   <button class="button button-primary" type="submit" id="editarSalvar">Salvar lembrança ♡</button>
