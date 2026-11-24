@@ -129,7 +129,7 @@
     const data = campoData.value.trim();
     const relato = campoRelato.value.trim();
     const fonte = campoFoto.value.trim();
-    const arquivo = campoArquivo?.files?.[0] || null;
+    let arquivo = campoArquivo?.files?.[0] || null;
 
     if (arquivo && !nuvem?.enabled) {
       mensagem('Envio direto de fotos só está disponível com o Supabase configurado.', true);
@@ -162,6 +162,13 @@
     if (nuvem?.enabled) {
       botaoSalvar.disabled = true;
       try {
+        if (arquivo && typeof window.albumOtimizarFoto === 'function') {
+          mensagem('Preparando sua foto para enviar…');
+          arquivo = await window.albumOtimizarFoto(arquivo);
+          if (arquivo.size > 5 * 1024 * 1024) {
+            throw new Error('Essa foto ainda tem mais de 5 MB. Escolha uma versão menor ou outra imagem.');
+          }
+        }
         await nuvem.saveMemory(memoria, arquivo);
         nuvem.formSaved?.(formulario);
         mensagem('Memória sincronizada na nuvem. Atualizando o álbum…');

@@ -68,3 +68,17 @@ Quando uma edição é salva em outro aparelho, o navegador busca novamente os r
 **A edição permanece aberta para qualquer pessoa, sem login nem código.** O Realtime não protege as memórias contra alterações indevidas. Guarde backups.
 
 Verificação no banco: publicação habilitada, dois gatilhos instalados, leitura anônima permitida somente para a tabela de sinal e atualização anônima proibida. Teste transacional dos dois gatilhos passou com rollback, sem alterar as fotos ou os relatos.
+
+## Histórico privado para recuperação
+
+A migração `supabase/migrations/202611230004_historico_seguro.sql` foi aplicada ao projeto. Ela cria `public.amor_historico` com RLS ativa, sem permissão de acesso direto para `anon` e `authenticated`. A função-gatilho `amor_guardar_historico` registra o estado `OLD` antes de sobrescrever ou excluir dados das tabelas `amor_memorias` e `amor_extras`, retendo no máximo 200 registros históricos.
+
+A migração criou seis cópias de base: as cinco memórias existentes e o registro das surpresas. Os gatilhos de ambas as tabelas foram testados dentro de uma transação revertida, sem alteração permanente nos dados do álbum.
+
+**Restaurar:** somente alguém com acesso administrativo ao projeto Supabase deve escolher uma revisão, verificar o JSON da coluna `conteudo` e restaurar manualmente os campos válidos. Não há endpoint público para listar ou restaurar o histórico, pois qualquer visitante poderia explorar esse recurso. O histórico **não duplica** os bytes das fotografias: preserva links e dados antigos. Não publique o conteúdo histórico sem avaliar a privacidade.
+
+## App no celular e fotos otimizadas
+
+O site oferece `manifest.webmanifest`, ícone SVG, instalador e cache do shell por `sw.js`. A instalação depende do navegador. O cache exclui requisições ao Supabase e sites de terceiros. Sem rede, a edição remota não funciona; a página pode mostrar as cinco memórias publicadas como alternativa.
+
+O `foto-otimizador.js` roda no celular antes do upload e reduz arquivos grandes com canvas, até 1800 px no maior lado, quando compatível. O limite de 5 MB do servidor, a validação MIME e o controle global de uploads permanecem iguais. O arquivo original não é modificado.

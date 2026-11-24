@@ -1191,3 +1191,31 @@ a { color: inherit; }
   .cloud-update-banner { top: 122px; }
   .cloud-status-bar { font-size: .74rem; }
 }
+
+/* Instalação no celular: discreta e acessível, sem ocultar a indicação de nuvem. */
+.install-app-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem 1rem;
+  padding: .55rem 1rem;
+  text-align: center;
+  background: #fff5f8;
+  border-bottom: 1px solid rgba(165, 70, 108, .13);
+}
+.install-app-bar .button {
+  font-size: .83rem;
+  min-height: 2.2rem;
+  padding: .4rem .85rem;
+}
+#instalarAppStatus {
+  max-width: 38rem;
+  color: #81415b;
+  font-size: .78rem;
+  line-height: 1.45;
+}
+@media (max-width: 480px) {
+  .install-app-bar { padding: .5rem .75rem; }
+  #instalarAppStatus { font-size: .73rem; }
+}

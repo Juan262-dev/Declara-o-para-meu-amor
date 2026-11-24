@@ -232,7 +232,8 @@
     // Os scripts do app precisam dos dados carregados antes de inicializar.
     await script('album-data.js?v=nuvem-1');
     await script('app.js?v=2026-11-19-fix-datas');
-    await script('editor.js?v=nuvem-1');
+    try { await script('foto-otimizador.js?v=celular-1'); } catch (_) { /* Upload normal continua funcionando. */ }
+    await script('editor.js?v=celular-1');
     await script('experiencias.js?v=nuvem-1');
     await script('privacidade.js?v=nuvem-1');
 

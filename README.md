@@ -25,6 +25,16 @@ A migração `supabase/migrations/202611230003_sinal_realtime_album.sql` cria a 
 
 O cliente usa `@supabase/supabase-js@2.86.0` por CDN para assinar mudanças. Se o CDN ou o canal falhar, a visualização não para de funcionar: continua a conferência a cada 60 segundos. A atualização automática recarrega a página preservando a posição de leitura; enquanto houver campos alterados ainda não salvos, oferece atualização manual para não perder o rascunho. Após salvar o último formulário pendente, as novidades passam a ser aplicadas automaticamente. **O site continua público para leitura e edição, sem login nem código.**
 
+## Melhorias para proteger e usar no celular
+
+**Histórico de versões no Supabase:** o banco guarda automaticamente o estado anterior de uma memória, bilhete ou lista de sonhos antes de cada alteração. A tabela `amor_historico` retém até 200 revisões e é **inacessível diretamente a visitantes**. Foram preservadas cópias iniciais das cinco fotos e das surpresas. **Não existe botão público de restaurar versões**: a recuperação deve ser feita por quem administra o projeto no Supabase, para evitar que visitantes restaurem dados arbitrários. As versões guardam textos e links de imagens, não uma segunda cópia do arquivo físico de cada foto.
+
+**Instalar no celular:** o site agora inclui `manifest.webmanifest`, ícone vetorial, botão “Adicionar à tela inicial” e um Service Worker que mantém apenas os arquivos estáticos básicos em cache para consultas quando a internet cair. O modo offline não permite salvar alterações na nuvem e pode não carregar fotos externas. Em alguns navegadores, a instalação fica no menu “Adicionar à tela inicial”, em vez de aparecer como um botão de confirmação.
+
+**Fotos mais leves:** o `foto-otimizador.js` tenta redimensionar fotos grandes para no máximo 1800 px no maior lado e comprimir a imagem no próprio aparelho antes de enviá-la. Mantém transparência de PNG quando convertida para WebP e preserva o original no celular. Se o aparelho não suportar a otimização, o envio normal continua disponível e ainda precisa respeitar o limite final de 5 MB. Imagens **já existentes** não são modificadas.
+
+**Privacidade:** o álbum continua público para visualização e edição, sem login nem código, mesmo após essas melhorias. Quem tiver o link pode alterar os registros atuais; os limites globais de envio reduzem abuso, mas não o eliminam.
+
 ## Upgrade completo — Etapa 1: editor de memórias
 
 A seção **Editar memórias** permite atualizar legendas, datas, relatos e links das fotografias. Com Supabase configurado, também envia fotos diretamente do celular (JPG, PNG ou WebP, até 5 MB). Sem nuvem, aceita somente URLs HTTPS ou arquivos já presentes em `fotos/`.

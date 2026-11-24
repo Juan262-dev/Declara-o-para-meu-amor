@@ -78,3 +78,13 @@ Nenhum acontecimento ou data de fotografias foi inventado.
 - Plano B por consulta a cada 60 segundos, inclusive quando o serviço Realtime/CDN estiver indisponível.
 - Migração e gatilhos verificados no Supabase; PR #10 integrado à `main`. Os cenários simulados passaram, mas ainda é importante testar com dois celulares reais.
 - **Continua sem login nem código.** Qualquer visitante pode visualizar e editar.
+
+## Etapa 8 — Proteção das lembranças e experiência no celular
+
+- **Histórico automático no Supabase (implantado):** tabela privada `amor_historico`, com até 200 revisões de memórias e surpresas, sem acesso direto de visitantes.
+- Migração `202611230004_historico_seguro.sql` aplicada. Gatilhos testados com transação e `ROLLBACK` para não modificar os relatos.
+- **Aplicativo instalável:** manifesto, ícone vetorial e botão para adicionar à tela inicial. O Service Worker faz cache somente de arquivos locais do site, nunca do Supabase.
+- **Modo offline limitado:** permite ler a cópia publicada do app quando disponível no cache; não permite salvar sem conexão.
+- **Otimização de fotos:** imagens grandes são reduzidas localmente antes do envio, preservando a original no aparelho. O servidor segue exigindo até 5 MB.
+- As cinco fotografias existentes e todo o conteúdo original foram mantidos.
+- A instalação, o modo offline e a compressão dependem dos recursos do navegador; devem ser testados no celular após publicação.
