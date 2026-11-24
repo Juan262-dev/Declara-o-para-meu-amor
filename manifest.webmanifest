@@ -1,0 +1,19 @@
+{
+  "name": "Nossa História Infinita — App do Meu Amor",
+  "short_name": "Nosso Amor",
+  "description": "Nosso álbum de memórias, fotos e sonhos.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffaf6",
+  "theme_color": "#b94c77",
+  "icons": [
+    {
+      "src": "assets/icone-app.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
