@@ -194,6 +194,7 @@
         return;
       }
       campoBilhete.value = '';
+      nuvem?.formSaved?.(formularioBilhete);
       renderizarBilhetes();
       aviso(statusBilhetes, 'Bilhete guardado ' + onde() + '.');
     });
@@ -243,6 +244,7 @@
         return;
       }
       mostrarMusica();
+      nuvem?.formSaved?.(formularioMusica);
       aviso(statusMusica, 'Cartão de música atualizado ' + onde() + '.');
     });
   }
@@ -313,6 +315,7 @@
         return;
       }
       campoSonho.value = '';
+      nuvem?.formSaved?.(formularioSonho);
       renderizarSonhos();
       aviso(statusSonhos, 'Sonho adicionado ' + onde() + '.');
     });
