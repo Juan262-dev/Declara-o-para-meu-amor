@@ -4,7 +4,7 @@ Um álbum de memórias romântico, com visual de livro e conteúdo real. Feito c
 
 ## Sincronização Supabase sem login e sem código
 
-**Status:** backend e site sem código já estão na versão principal. O **modo Realtime** está preparado nesta branch de revisão e será disponibilizado no site após a publicação do Pull Request correspondente.
+**Status:** backend, site e canal de sincronização Realtime já foram integrados à `main` pelo PR #10. Esta revisão corrige a proteção dos rascunhos: um formulário só impede atualizações automáticas enquanto houver alterações ainda não salvas.
 
 **Proteção contra excesso de uso:** até 30 edições a cada 15 minutos, 4 fotos por hora e 8 fotos por 24 horas, para todos os visitantes somados. Faça backups JSON e guarde os originais das imagens fora do site.
 
@@ -23,7 +23,7 @@ Arquivos da integração: `cloud-config.js`, `cloud-bootstrap.js`, `supabase/fun
 
 A migração `supabase/migrations/202611230003_sinal_realtime_album.sql` cria a tabela `amor_sinal` e os dois gatilhos. O canal público de Realtime recebe **somente um número de versão**, sem transmitir memórias ou imagens. O app então busca os dados na função `album-sync`.
 
-O cliente usa `@supabase/supabase-js@2.86.0` por CDN para assinar mudanças. Se o CDN ou o canal falhar, a visualização não para de funcionar: continua a conferência a cada 60 segundos. A atualização automática recarrega a página preservando a posição de leitura; durante a digitação, oferece atualização manual para não perder o conteúdo ainda não salvo. **O site continua público para leitura e edição, sem login nem código.**
+O cliente usa `@supabase/supabase-js@2.86.0` por CDN para assinar mudanças. Se o CDN ou o canal falhar, a visualização não para de funcionar: continua a conferência a cada 60 segundos. A atualização automática recarrega a página preservando a posição de leitura; enquanto houver campos alterados ainda não salvos, oferece atualização manual para não perder o rascunho. Após salvar o último formulário pendente, as novidades passam a ser aplicadas automaticamente. **O site continua público para leitura e edição, sem login nem código.**
 
 ## Upgrade completo — Etapa 1: editor de memórias
 

@@ -163,6 +163,7 @@
       botaoSalvar.disabled = true;
       try {
         await nuvem.saveMemory(memoria, arquivo);
+        nuvem.formSaved?.(formulario);
         mensagem('Memória sincronizada na nuvem. Atualizando o álbum…');
         window.location.reload();
       } catch (erro) {

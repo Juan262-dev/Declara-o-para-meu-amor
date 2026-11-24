@@ -50,7 +50,7 @@ Nenhum acontecimento ou data de fotografias foi inventado.
 ## Etapa 5 — Sincronização em nuvem sem login (integrada à main)
 
 - Criados os arquivos do banco PostgreSQL, Edge Function e Storage público no diretório `supabase/`.
-- O site carrega dados pelo endpoint público GET e salva com POST. **A proposta da etapa 6 remove a exigência do código de edição**.
+- O site carrega dados pelo endpoint público GET e salva com POST, sem login nem código de edição.
 - Upload de fotos JPG/PNG/WebP do celular até 5 MB.
 - Sincroniza relatos, datas, legendas, bilhetes, música e sonhos entre aparelhos.
 - Verifica atualizações e oferece botão para recarregar, sem fechar o formulário automaticamente.
@@ -69,12 +69,12 @@ Nenhum acontecimento ou data de fotografias foi inventado.
 - PR #9 integrado; o servidor e a `main` estão sem exigência de código.
 
 
-## Etapa 7 — Notificações Realtime (preparadas para revisão)
+## Etapa 7 — Sincronização em tempo real (integrada ao GitHub)
 
 - Migração instalada: `amor_sinal` anuncia somente versões, sem expor fotos, textos ou outros dados nas notificações.
 - Gatilhos em `amor_memorias` e `amor_extras`; `supabase_realtime` publica apenas `amor_sinal`.
 - Frontend assina `postgres_changes`, busca conteúdo atualizado e recarrega a página automaticamente quando não há texto sendo editado.
-- Com formulário em uso, avisa e oferece botão para atualizar, sem descartar o texto automaticamente.
+- Com formulários contendo alterações não salvas, avisa e oferece botão para atualizar sem descartar o rascunho. Depois de salvar o último formulário pendente, aplica as novidades automaticamente.
 - Plano B por consulta a cada 60 segundos, inclusive quando o serviço Realtime/CDN estiver indisponível.
-- Migração e 11 cenários de cliente testados; ainda é preciso testar com dois celulares reais após o merge do PR.
+- Migração e gatilhos verificados no Supabase; PR #10 integrado à `main`. Os cenários simulados passaram, mas ainda é importante testar com dois celulares reais.
 - **Continua sem login nem código.** Qualquer visitante pode visualizar e editar.
