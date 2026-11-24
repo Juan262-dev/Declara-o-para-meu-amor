@@ -24,13 +24,17 @@ security invoker
 set search_path = ''
 as $$
 begin
-  insert into public.amor_historico (tipo, registro_id, operacao, conteudo)
-  values (
-    case when TG_TABLE_NAME = 'amor_memorias' then 'memoria' else 'extras' end,
-    case when TG_TABLE_NAME = 'amor_memorias' then OLD.foto_indice else OLD.id end,
-    case when TG_OP = 'DELETE' then 'antes_excluir' else 'antes_editar' end,
-    to_jsonb(OLD)
-  );
+  if TG_TABLE_NAME = 'amor_memorias' then
+    insert into public.amor_historico(tipo, registro_id, operacao, conteudo)
+    values ('memoria', OLD.foto_indice,
+      case when TG_OP = 'DELETE' then 'antes_excluir' else 'antes_editar' end,
+      to_jsonb(OLD));
+  elsif TG_TABLE_NAME = 'amor_extras' then
+    insert into public.amor_historico(tipo, registro_id, operacao, conteudo)
+    values ('extras', OLD.id,
+      case when TG_OP = 'DELETE' then 'antes_excluir' else 'antes_editar' end,
+      to_jsonb(OLD));
+  end if;
 
   -- Limita armazenamento histórico a 200 versões para conter custos.
   delete from public.amor_historico
