@@ -1,5 +1,5 @@
-// Carregador do álbum: usa dados do Supabase quando o projeto está configurado.
-// Não exige login nem código para visualizar ou editar. A escrita pública é limitada pelo servidor.
+// Carrega lembranças e mantém a página sincronizada com Supabase Realtime.
+// Sem login e sem código. O canal anuncia apenas VERSÕES, nunca fotos ou relatos.
 (async () => {
   'use strict';
 
@@ -7,10 +7,21 @@
   const url = typeof config.projectUrl === 'string' ? config.projectUrl.trim().replace(/\/+$/, '') : '';
   const valido = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url);
   const endpoint = valido ? url + '/functions/v1/album-sync' : '';
-  let assinaturaRemota = '';
+  const chavePublica = typeof config.publishableKey === 'string'
+    && /^sb_publishable_[a-zA-Z0-9_-]+$/.test(config.publishableKey)
+    ? config.publishableKey : '';
+  const SCROLL_KEY = 'album-realtime-scroll-v1';
   const status = document.getElementById('cloudConnectionStatus');
   const aviso = document.getElementById('cloudNewData');
   const botaoAtualizar = document.getElementById('cloudUpdateButton');
+
+  let assinaturaRemota = '';
+  let editando = false;
+  let verificando = false;
+  let verificacaoPendente = false;
+  let avisoPendente = false;
+  let clienteRealtime = null;
+  let canalRealtime = null;
 
   function informar(mensagem, erro = false) {
     if (!status) return;
@@ -50,8 +61,7 @@
     if (!nuvem.enabled || !nuvem.online) {
       throw new Error('A nuvem está indisponível. Não foi feita nenhuma alteração.');
     }
-    // Nenhum código, token de edição ou login solicitado ao visitante.
-    // O servidor ainda valida os dados e limita a frequência das gravações.
+    // O servidor valida tamanho, formato e frequência; nenhum código de edição é usado.
     const cabecalhos = {};
     let corpo;
     if (arquivo) {
@@ -69,8 +79,7 @@
     }
 
     const resposta = await fetch(endpoint, {
-      method: 'POST', headers: cabecalhos, body: corpo,
-      cache: 'no-store',
+      method: 'POST', headers: cabecalhos, body: corpo, cache: 'no-store',
     });
     const recebido = await resposta.json().catch(() => ({}));
     if (!resposta.ok) throw new Error(recebido.erro || 'Não foi possível sincronizar.');
@@ -80,12 +89,102 @@
   const nuvem = {
     enabled: Boolean(endpoint),
     online: false,
+    realtime: false,
     async saveMemory(dados, arquivo = null) { return gravar('salvar-memoria', dados, arquivo); },
     async saveExtras(dados) { return gravar('salvar-extras', dados); },
     async fetchLatest() { return buscar(); },
     async refresh() { window.location.reload(); },
   };
   window.albumCloud = nuvem;
+
+  function usuarioPreenchendo() {
+    // Não recarregar se há texto não salvo, arquivo escolhido ou campo em foco.
+    const campoAtivo = document.activeElement;
+    const focado = campoAtivo && typeof campoAtivo.closest === 'function'
+      && campoAtivo.closest('form, [contenteditable="true"]');
+    return editando || Boolean(focado);
+  }
+
+  function recarregarPreservandoPosicao() {
+    try {
+      window.sessionStorage.setItem(SCROLL_KEY, String(window.scrollY || 0));
+    } catch (_) { /* sessionStorage pode estar bloqueado. */ }
+    window.location.reload();
+  }
+
+  function apresentarNovidades() {
+    avisoPendente = true;
+    if (aviso) {
+      aviso.hidden = false;
+      const mensagem = aviso.querySelector('span');
+      if (mensagem) mensagem.textContent = usuarioPreenchendo()
+        ? '♡ Há novidades! Termine de editar e salve antes de atualizar.'
+        : '♡ Há novas lembranças na nuvem.';
+    }
+  }
+
+  async function verificarNovidades() {
+    if (!nuvem.online) return;
+    if (document.hidden) {
+      verificacaoPendente = true;
+      return;
+    }
+    if (verificando) {
+      verificacaoPendente = true;
+      return;
+    }
+    verificando = true;
+    try {
+      const dados = await buscar();
+      if (JSON.stringify(dados) !== assinaturaRemota) {
+        if (usuarioPreenchendo()) apresentarNovidades();
+        else recarregarPreservandoPosicao();
+      }
+    } catch (_) {
+      // Offline: os dados atuais ficam na tela e o polling tenta novamente.
+    } finally {
+      verificando = false;
+      if (verificacaoPendente && !document.hidden) {
+        verificacaoPendente = false;
+        // Evita recursão direta de chamadas durante mensagens em sequência.
+        window.setTimeout(() => { void verificarNovidades(); }, 300);
+      }
+    }
+  }
+
+  async function iniciarRealtime() {
+    if (!chavePublica || !nuvem.online) return;
+    try {
+      // Dependência fixa para não mudar automaticamente entre implantações.
+      await script('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0');
+      if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+        throw new Error('Biblioteca Realtime indisponível.');
+      }
+      clienteRealtime = window.supabase.createClient(url, chavePublica, {
+        auth: { persistSession: false, autoRefreshToken: false },
+        realtime: { params: { eventsPerSecond: 2 } },
+      });
+      canalRealtime = clienteRealtime
+        .channel('amor-versao-publica')
+        .on('postgres_changes', {
+          event: 'UPDATE', schema: 'public', table: 'amor_sinal',
+        }, () => { void verificarNovidades(); })
+        .subscribe(estado => {
+          if (estado === 'SUBSCRIBED') {
+            nuvem.realtime = true;
+            informar('☁ Tempo real conectado. Novidades aparecem automaticamente.');
+            // Recupera alterações entre o GET inicial e o início do canal.
+            void verificarNovidades();
+          } else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT' || estado === 'CLOSED') {
+            nuvem.realtime = false;
+            informar('☁ Nuvem conectada. Verificando novidades periodicamente.');
+          }
+        });
+    } catch (_) {
+      nuvem.realtime = false;
+      informar('☁ Nuvem conectada. Verificando novidades periodicamente.');
+    }
+  }
 
   try {
     await script('memorias.js?v=2026-11-19-fix-datas');
@@ -99,35 +198,55 @@
         window.albumSurpresas = remotos.extras;
         assinaturaRemota = JSON.stringify(remotos);
         nuvem.online = true;
-        informar('☁ Lembranças sincronizadas. Sem login nem código de edição.');
-      } catch (_erro) {
+        informar('☁ Lembranças sincronizadas. Sem login nem código.');
+      } catch (_) {
         informar('Nuvem indisponível. Exibindo cópia publicada; edição desativada até reconectar.', true);
       }
     } else {
       informar('Modo local: sem Supabase configurado. Suas edições permanecem neste aparelho.');
     }
 
-    // A ordem é importante: os scripts existentes esperam os dados já preparados.
+    // Os scripts do app precisam dos dados carregados antes de inicializar.
     await script('album-data.js?v=nuvem-1');
     await script('app.js?v=2026-11-19-fix-datas');
     await script('editor.js?v=nuvem-1');
     await script('experiencias.js?v=nuvem-1');
     await script('privacidade.js?v=nuvem-1');
 
+    // Restaura a posição após atualização automática de uma página não editada.
+    try {
+      const posicao = window.sessionStorage.getItem(SCROLL_KEY);
+      if (posicao !== null) {
+        window.sessionStorage.removeItem(SCROLL_KEY);
+        window.setTimeout(() => window.scrollTo(0, Number(posicao) || 0), 100);
+      }
+    } catch (_) { /* Também funciona sem armazenamento local. */ }
+
     if (nuvem.online && botaoAtualizar && aviso) {
-      botaoAtualizar.addEventListener('click', () => window.location.reload());
-      // Sem atualizar a página à força e perder campos que estiverem sendo editados.
-      window.setInterval(async () => {
-        if (document.hidden || !nuvem.online) return;
-        try {
-          const dados = await buscar();
-          if (JSON.stringify(dados) !== assinaturaRemota) aviso.hidden = false;
-        } catch (_) {
-          // A página continua funcionando com a última cópia obtida.
+      botaoAtualizar.addEventListener('click', () => {
+        if (usuarioPreenchendo() && !window.confirm(
+          'Você está editando alguma coisa. Deseja atualizar mesmo assim? Alterações não salvas serão perdidas.'
+        )) return;
+        recarregarPreservandoPosicao();
+      });
+
+      document.addEventListener('input', evento => {
+        const elemento = evento.target;
+        if (elemento && typeof elemento.closest === 'function' && elemento.closest('form')) {
+          editando = true;
+          if (avisoPendente) apresentarNovidades();
         }
-      }, 60000);
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) void verificarNovidades();
+      });
+
+      // Plano B quando websocket/CDN falhar ou celular sair do modo de suspensão.
+      window.setInterval(() => { void verificarNovidades(); }, 60000);
+      void iniciarRealtime();
     }
-  } catch (_erro) {
+  } catch (_) {
     informar('Não foi possível iniciar o álbum. Atualize a página e tente novamente.', true);
   }
 })();

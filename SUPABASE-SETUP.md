@@ -10,11 +10,11 @@
 - Migração `album_publico_sem_login` instalada.
 - Migração `limites_edicao_publica` instalada para conter parte dos abusos.
 
-## Mudança desta branch
+## Acesso do álbum
 
 **Nenhum visitante precisa de login, senha ou código para ler ou editar.** Qualquer pessoa que conseguir abrir o site poderá adicionar e alterar fotos, legendas, datas, relatos, bilhetes, o link da música e os sonhos. Quem alterar uma lembrança estará alterando a versão que todos veem. Isso foi solicitado explicitamente pelo responsável pelo álbum.
 
-A função e o site ainda precisam ser publicados juntos, depois da aprovação do PR desta branch. Até essa publicação, a função atual em produção pode continuar pedindo o código antigo.
+O site e a função de edição sem código já foram publicados. A integração de notificações Realtime está preparada em uma nova branch de revisão, aguardando integração ao site.
 
 ## Como a segurança funciona agora
 
@@ -51,3 +51,21 @@ A migração da limitação já foi aplicada, o que não alterou a proteção po
 - `supabase/functions/album-sync/index.ts`: função pública com validação e limite.
 - `supabase/migrations/202611230002_limites_edicao_publica.sql`: proteção de abuso com função SQL `SECURITY INVOKER`.
 - `README.md` e `ROADMAP.md`: comportamento e versões.
+
+
+## Sincronização em tempo real (etapa 7)
+
+A migração `supabase/migrations/202611230003_sinal_realtime_album.sql` foi aplicada no Supabase. Ela cria:
+
+- `public.amor_sinal`: contém somente `id`, `versao` e `atualizado_em` (nenhum dado pessoal);
+- dois gatilhos: qualquer INSERT/UPDATE/DELETE em `amor_memorias` ou `amor_extras` incrementa o número da versão;
+- acesso anônimo **somente de leitura** a esse número, com RLS ativa;
+- assinatura do sinal por `supabase_realtime`, sem publicar a tabela de fotos ou relatos.
+
+Na branch do site, `cloud-config.js` usa apenas a **chave publishable** pública, nunca um segredo do servidor. `cloud-bootstrap.js` carrega a versão fixada de `@supabase/supabase-js@2.86.0` por CDN e assina `postgres_changes` da tabela `amor_sinal`.
+
+Quando uma edição é salva em outro aparelho, o navegador busca novamente os registros por HTTPS pela Edge Function `album-sync`, em vez de aceitar o conteúdo do evento. Se o visitante não está escrevendo, a página recarrega automaticamente preservando a posição; se está editando, surge um aviso para atualizar depois de salvar. Em caso de CDN indisponível, queda do websocket ou suspensão do celular, a conferência de novidades a cada 60 segundos e ao voltar à aba continua disponível.
+
+**A edição permanece aberta para qualquer pessoa, sem login nem código.** O Realtime não protege as memórias contra alterações indevidas. Guarde backups.
+
+Verificação no banco: publicação habilitada, dois gatilhos instalados, leitura anônima permitida somente para a tabela de sinal e atualização anônima proibida. Teste transacional dos dois gatilhos passou com rollback, sem alterar as fotos ou os relatos.

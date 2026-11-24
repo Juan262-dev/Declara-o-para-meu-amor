@@ -2,22 +2,28 @@
 
 Um álbum de memórias romântico, com visual de livro e conteúdo real. Feito com HTML, CSS e JavaScript, sem dependências na página.
 
-## Sincronização Supabase SEM LOGIN e SEM CÓDIGO (proposta de atualização)
+## Sincronização Supabase sem login e sem código
 
-**Status da mudança:** o código foi preparado em uma branch de revisão. A função atualmente publicada pode continuar exigindo o código anterior até que a nova função seja implantada junto com o site. A migração de limites já foi instalada no Supabase.
+**Status:** backend e site sem código já estão na versão principal. O **modo Realtime** está preparado nesta branch de revisão e será disponibilizado no site após a publicação do Pull Request correspondente.
 
 **Proteção contra excesso de uso:** até 30 edições a cada 15 minutos, 4 fotos por hora e 8 fotos por 24 horas, para todos os visitantes somados. Faça backups JSON e guarde os originais das imagens fora do site.
 
-O projeto Supabase **App do Meu Amor** (`jfedjtdyjpvqzetlexuf`) já foi criado em São Paulo e o banco, Storage e a função `album-sync` já estão configurados. A URL do projeto foi incluída em `cloud-config.js` nesta branch. **A versão publicada do GitHub Pages ainda não foi alterada**, pois o PR #8 aguarda revisão e merge. Consulte **[SUPABASE-SETUP.md](SUPABASE-SETUP.md)** para os detalhes.
+O projeto Supabase **App do Meu Amor** (`jfedjtdyjpvqzetlexuf`) está ativo em São Paulo, com banco, Storage e função `album-sync` configurados. A URL e a chave **publishable** (que não é secreta) estão em `cloud-config.js`. Consulte **[SUPABASE-SETUP.md](SUPABASE-SETUP.md)** para os detalhes.
 
 - **Visualizar:** qualquer pessoa com o endereço do site pode ver as memórias.
 - **Editar:** qualquer visitante poderá salvar fotos, datas, relatos, bilhetes e sonhos sem login e sem código. **Isso permite edições indesejadas por desconhecidos.**
-- **Sincronizar:** na versão conectada ao Supabase, salvar uma memória, bilhete, música ou sonho envia a alteração à nuvem. Outros celulares veem a nova versão ao abrir/atualizar a página e recebem um aviso se surgirem novidades.
+- **Sincronizar em tempo real (novo):** o Supabase emite um sinal de versão ao salvar fotos, relatos, bilhetes, música ou sonhos. Com o app aberto e sem edição em andamento, outro celular busca os dados e atualiza automaticamente. Se houver texto sendo editado, aparece um aviso com botão de atualização. Sem conexão Realtime, o app verifica novidades a cada 60 segundos.
 - **Enviar fotos:** com a nuvem ativa, é possível escolher JPG, PNG ou WebP de até 5 MB diretamente no celular. As imagens vão para um bucket **público**.
 - **Sem nuvem:** o editor continua funcionando localmente, com exportação manual de arquivos.
 - **Sem autenticação de contas:** não há área privada de leitura. A RLS impede acesso direto às tabelas, mas a Edge Function disponibiliza leitura pública por decisão do produto. **Não publique informações pessoais que devam ficar secretas.**
 
 Arquivos da integração: `cloud-config.js`, `cloud-bootstrap.js`, `supabase/functions/album-sync/index.ts`, `supabase/migrations/202611230001_album_publico_sem_login.sql`, `supabase/migrations/202611230002_limites_edicao_publica.sql` e `SUPABASE-SETUP.md`. **Não publique chaves secretas do servidor.**
+
+### Como funciona o tempo real
+
+A migração `supabase/migrations/202611230003_sinal_realtime_album.sql` cria a tabela `amor_sinal` e os dois gatilhos. O canal público de Realtime recebe **somente um número de versão**, sem transmitir memórias ou imagens. O app então busca os dados na função `album-sync`.
+
+O cliente usa `@supabase/supabase-js@2.86.0` por CDN para assinar mudanças. Se o CDN ou o canal falhar, a visualização não para de funcionar: continua a conferência a cada 60 segundos. A atualização automática recarrega a página preservando a posição de leitura; durante a digitação, oferece atualização manual para não perder o conteúdo ainda não salvo. **O site continua público para leitura e edição, sem login nem código.**
 
 ## Upgrade completo — Etapa 1: editor de memórias
 
