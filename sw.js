@@ -1,12 +1,12 @@
 /* Cache só do código do álbum; nunca guarda respostas Supabase ou fotos externas.
    A navegação prefere internet. Offline mostra o shell e as memórias publicadas no repositório. */
-const CACHE = 'album-do-meu-amor-shell-v1';
+const CACHE = 'album-do-meu-amor-shell-v2';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js',
   './memorias.js', './surpresas-data.js', './cloud-config.js',
   './cloud-bootstrap.js', './album-data.js', './editor.js',
   './experiencias.js', './privacidade.js', './foto-otimizador.js',
-  './pwa.js', './manifest.webmanifest', './assets/icone-app.svg',
+  './pwa.js', './temas.js', './manifest.webmanifest', './assets/icone-app.svg',
   './fotos/lembranca-04.webp', './fotos/lembranca-05.webp'
 ];
 self.addEventListener('install', evento => {
