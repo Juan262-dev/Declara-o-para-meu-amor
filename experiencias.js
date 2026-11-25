@@ -4,12 +4,13 @@
   'use strict';
 
   const STORAGE_KEY = 'nossa-historia-infinita-experiencias-v1';
-  const publicados = window.albumSurpresas || { bilhetes: [], musica: {}, sonhos: [] };
+  const publicados = window.albumSurpresas || { bilhetes: [], musica: {}, sonhos: [], surpresas: [] };
   const nuvem = window.albumCloud;
   const onde = () => nuvem?.enabled ? 'na nuvem' : 'neste aparelho';
   let ultimoErro = '';
   const maxBilhetes = 50;
   const maxSonhos = 50;
+  const maxSurpresas = 20;
   const porId = id => document.getElementById(id);
   const texto = (valor, limite) => typeof valor === 'string' ? valor.trim().slice(0, limite) : '';
 
@@ -20,6 +21,13 @@
     } catch (_) {
       return false;
     }
+  }
+
+  function dataSurpresaValida(valor) {
+    if (typeof valor !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
+    const [ano, mes, dia] = valor.split('-').map(Number);
+    const teste = new Date(Date.UTC(ano, mes - 1, dia));
+    return teste.getUTCFullYear() === ano && teste.getUTCMonth() === mes - 1 && teste.getUTCDate() === dia;
   }
 
   function normalizarExtras(origem) {
@@ -40,7 +48,22 @@
       ? { titulo: texto(data.musica.titulo, 110), url: texto(data.musica.url, 1200) }
       : { titulo: '', url: '' };
     if (!linkSeguro(musica.url)) musica.url = '';
-    return { bilhetes, sonhos, musica };
+    const idsSurpresas = new Set();
+    const surpresas = Array.isArray(data.surpresas)
+      ? data.surpresas.filter(item => {
+        if (!item || typeof item !== 'object' || typeof item.id !== 'string' ||
+          !item.id.trim() || item.id.length > 70 || idsSurpresas.has(item.id) ||
+          typeof item.titulo !== 'string' || !item.titulo.trim() || item.titulo.length > 100 ||
+          typeof item.mensagem !== 'string' || !item.mensagem.trim() || item.mensagem.length > 600 ||
+          !dataSurpresaValida(item.data) || typeof item.anual !== 'boolean') return false;
+        idsSurpresas.add(item.id);
+        return true;
+      }).slice(0, maxSurpresas).map(item => ({
+        id: item.id, titulo: item.titulo.trim(), mensagem: item.mensagem.trim(),
+        data: item.data, anual: item.anual
+      }))
+      : [];
+    return { bilhetes, sonhos, musica, surpresas };
   }
 
   let armazenamentoDisponivel = true;
@@ -53,7 +76,8 @@
     extras = salvo ? normalizarExtras(JSON.parse(salvo)) : normalizarExtras({
       bilhetes: [],
       musica: publicados.musica,
-      sonhos: publicados.sonhos
+      sonhos: publicados.sonhos,
+      surpresas: publicados.surpresas
     });
   } catch (_) {
     armazenamentoDisponivel = false;
@@ -320,6 +344,151 @@
       aviso(statusSonhos, 'Sonho adicionado ' + onde() + '.');
     });
     renderizarSonhos();
+  }
+
+  // Cartinhas que aparecem na data marcada. A ocultação é somente visual:
+  // o álbum é público e os dados podem ser consultados e editados pelos visitantes.
+  const formSurpresa = porId('formSurpresaProgramada');
+  const tituloSurpresa = porId('surpresaTitulo');
+  const mensagemSurpresa = porId('surpresaMensagem');
+  const dataSurpresa = porId('surpresaData');
+  const anualSurpresa = porId('surpresaAnual');
+  const listaAgendadas = porId('listaSurpresasProgramadas');
+  const listaReveladas = porId('listaSurpresasReveladas');
+  const avisoSurpresa = porId('statusSurpresasProgramadas');
+  const cancelarSurpresa = porId('cancelarEdicaoSurpresa');
+  const botaoSurpresa = porId('salvarSurpresaProgramada');
+  let surpresaEditada = null;
+
+  function dataLocal(agora = new Date()) {
+    return agora.getFullYear() + '-' +
+      String(agora.getMonth() + 1).padStart(2, '0') + '-' +
+      String(agora.getDate()).padStart(2, '0');
+  }
+
+  function formatarData(data, anual = false) {
+    const [ano, mes, dia] = data.split('-');
+    return dia + '/' + mes + (anual ? ' (todo ano)' : '/' + ano);
+  }
+
+  function podeRevelar(item, hoje = dataLocal()) {
+    if (hoje < item.data) return false;
+    return item.anual ? hoje.slice(5) === item.data.slice(5) : true;
+  }
+
+  function renderizarSurpresas() {
+    if (!listaAgendadas || !listaReveladas) return;
+    listaAgendadas.replaceChildren();
+    listaReveladas.replaceChildren();
+    if (!extras.surpresas.length) {
+      const vazio = document.createElement('p');
+      vazio.textContent = 'Nenhuma surpresa programada ainda. Escolha uma data e escreva a primeira cartinha.';
+      listaReveladas.append(vazio);
+    }
+
+    for (const item of extras.surpresas) {
+      const revelada = podeRevelar(item);
+      const cartao = document.createElement('article');
+      cartao.className = 'surpresa-data-card ' + (revelada ? 'surpresa-revelada' : 'surpresa-bloqueada');
+      const titulo = document.createElement('h3');
+      titulo.textContent = revelada ? item.titulo : '♡ Uma cartinha para uma data especial';
+      const quando = document.createElement('p');
+      quando.className = 'surpresa-data-quando';
+      quando.textContent = revelada
+        ? 'Aberta em ' + formatarData(item.data, item.anual)
+        : '🔒 Abre em ' + formatarData(item.data, item.anual);
+      const textoSurpresa = document.createElement('p');
+      textoSurpresa.className = 'surpresa-data-texto';
+      textoSurpresa.textContent = revelada
+        ? item.mensagem
+        : 'Esta mensagem aparece quando chegar a data marcada.';
+      cartao.append(quando, titulo, textoSurpresa);
+      listaReveladas.append(cartao);
+
+      const linha = document.createElement('li');
+      const descricao = document.createElement('span');
+      descricao.textContent = item.titulo + ' — ' + formatarData(item.data, item.anual);
+      const acoes = document.createElement('div');
+      acoes.className = 'surpresa-data-acoes';
+      const editar = document.createElement('button');
+      editar.type = 'button';
+      editar.textContent = 'Editar';
+      editar.addEventListener('click', () => {
+        surpresaEditada = item.id;
+        tituloSurpresa.value = item.titulo;
+        mensagemSurpresa.value = item.mensagem;
+        dataSurpresa.value = item.data;
+        anualSurpresa.checked = item.anual;
+        botaoSurpresa.textContent = 'Salvar alterações';
+        cancelarSurpresa.hidden = false;
+        formSurpresa.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+      });
+      const remover = document.createElement('button');
+      remover.type = 'button';
+      remover.textContent = 'Remover';
+      remover.addEventListener('click', async () => {
+        if (!window.confirm('Remover esta surpresa programada de todos os aparelhos?')) return;
+        const anterior = [...extras.surpresas];
+        extras.surpresas = extras.surpresas.filter(s => s.id !== item.id);
+        if (!(await salvar())) {
+          extras.surpresas = anterior;
+          aviso(avisoSurpresa, ultimoErro, true);
+          return;
+        }
+        renderizarSurpresas();
+        aviso(avisoSurpresa, 'Surpresa removida ' + onde() + '.');
+      });
+      acoes.append(editar, remover);
+      linha.append(descricao, acoes);
+      listaAgendadas.append(linha);
+    }
+  }
+
+  function limparEdicaoSurpresa() {
+    surpresaEditada = null;
+    formSurpresa?.reset();
+    if (botaoSurpresa) botaoSurpresa.textContent = 'Programar cartinha ♡';
+    if (cancelarSurpresa) cancelarSurpresa.hidden = true;
+    nuvem?.formSaved?.(formSurpresa);
+  }
+
+  if (formSurpresa && listaAgendadas && listaReveladas) {
+    formSurpresa.addEventListener('submit', async evento => {
+      evento.preventDefault();
+      const titulo = tituloSurpresa.value.trim();
+      const mensagem = mensagemSurpresa.value.trim();
+      const data = dataSurpresa.value;
+      const anual = anualSurpresa.checked;
+      if (!titulo || titulo.length > 100 || !mensagem || mensagem.length > 600 ||
+        !dataSurpresaValida(data)) {
+        aviso(avisoSurpresa, 'Preencha título, cartinha e uma data válida.', true);
+        return;
+      }
+      if (!surpresaEditada && extras.surpresas.length >= maxSurpresas) {
+        aviso(avisoSurpresa, 'O limite é de 20 cartinhas programadas.', true);
+        return;
+      }
+      const anterior = [...extras.surpresas];
+      const id = surpresaEditada || ('surpresa-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10));
+      const nova = { id, titulo, mensagem, data, anual };
+      if (surpresaEditada) {
+        extras.surpresas = extras.surpresas.map(item => item.id === id ? nova : item);
+      } else {
+        extras.surpresas.push(nova);
+      }
+      if (!(await salvar())) {
+        extras.surpresas = anterior;
+        aviso(avisoSurpresa, ultimoErro, true);
+        return;
+      }
+      limparEdicaoSurpresa();
+      renderizarSurpresas();
+      aviso(avisoSurpresa, 'Cartinha programada ' + onde() + '.');
+    });
+    cancelarSurpresa?.addEventListener('click', limparEdicaoSurpresa);
+    renderizarSurpresas();
+    // Uma cartinha também se revela sem recarregar se o app ficar aberto à meia-noite.
+    window.setInterval(renderizarSurpresas, 60 * 1000);
   }
 
   // Backups e publicação usam cópias validadas deste objeto.

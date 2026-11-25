@@ -96,7 +96,23 @@
       (url && (!experiencias.linkSeguro(url) || !titulo.trim()))) {
       throw new Error('O link ou título da música no backup é inválido.');
     }
-    return experiencias.normalizar(data);
+    // Backups antigos não têm surpresas programadas: preserva as atuais.
+    const atuais = experiencias.ler().surpresas || [];
+    const programadas = data.surpresas === undefined ? atuais : data.surpresas;
+    if (!Array.isArray(programadas) || programadas.length > 20) {
+      throw new Error('O backup possui um número inválido de cartinhas programadas.');
+    }
+    const ids = new Set();
+    if (programadas.some(item => {
+      if (!item || typeof item.id !== 'string' || !item.id || item.id.length > 70 ||
+          ids.has(item.id) || typeof item.titulo !== 'string' || !item.titulo.trim() ||
+          item.titulo.length > 100 || typeof item.mensagem !== 'string' ||
+          !item.mensagem.trim() || item.mensagem.length > 600 || !dataValida(item.data) ||
+          !item.data || typeof item.anual !== 'boolean') return true;
+      ids.add(item.id);
+      return false;
+    })) throw new Error('O backup possui cartinhas ou datas programadas inválidas.');
+    return experiencias.normalizar({ ...data, surpresas: programadas });
   }
 
   function mostrarStatus(mensagem, erro = false) {
@@ -123,7 +139,8 @@
       mems.filter(m => m.relato).length + ' relatos, ' +
       new Set([...(Array.isArray(publicados.bilhetes) ? publicados.bilhetes : []), ...extras.bilhetes]).size +
       ' bilhetes no total, ' + extras.sonhos.length +
-      ' sonhos e ' + (extras.musica.url ? 'um link de música' : 'nenhum link de música') +
+      ' sonhos, ' + (extras.surpresas?.length || 0) + ' cartinhas programadas e ' +
+      (extras.musica.url ? 'um link de música' : 'nenhum link de música') +
       (nuvem?.enabled
         ? '. No modo nuvem, alterações salvas são públicas para visitantes do álbum.'
         : '. Só os arquivos que você enviar ao GitHub serão publicados.');
@@ -169,10 +186,12 @@
     const dados = {
       bilhetes: [...new Set([...bilhetesPublicados, ...extras.bilhetes])],
       musica: extras.musica,
-      sonhos: extras.sonhos
+      sonhos: extras.sonhos,
+      surpresas: extras.surpresas
     };
     try {
-      validarExtras({ bilhetes: extras.bilhetes, musica: extras.musica, sonhos: extras.sonhos });
+      validarExtras({ bilhetes: extras.bilhetes, musica: extras.musica, sonhos: extras.sonhos,
+          surpresas: extras.surpresas });
       const script = '// Surpresas publicadas no App do Meu Amor.\n' +
         'window.albumSurpresas = Object.freeze(' + JSON.stringify(dados, null, 2) + ');\n';
       baixarArquivo('surpresas-data.js', script, 'text/javascript;charset=utf-8');

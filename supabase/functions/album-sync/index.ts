@@ -10,6 +10,7 @@ type Extra = {
   bilhetes: string[];
   musica: { titulo: string; url: string };
   sonhos: { id: string; titulo: string; concluido: boolean }[];
+  surpresas: { id: string; titulo: string; mensagem: string; data: string; anual: boolean }[];
 };
 
 const BUCKET = "amor-fotos-publicas";
@@ -20,6 +21,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_MEMORIES = 40;
 const MAX_BILHETES = 50;
 const MAX_SONHOS = 50;
+const MAX_SURPRESAS = 20;
 
 function json(data: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(data), {
@@ -89,12 +91,34 @@ function normalizarExtras(dados: unknown): Extra | null {
     typeof musica.url !== "string" || musica.url.length > 1200 ||
     (musica.url && (!urlHttps(musica.url) || !musica.titulo.trim()))) return null;
 
+  // Clientes antigos não conhecem "surpresas". A preservação dessas mensagens
+  // acontece no POST antes do upsert; não sobrescrever com [] ao atualizar bilhetes.
+  const surpresas = d.surpresas === undefined ? [] : d.surpresas;
+  if (!Array.isArray(surpresas) || surpresas.length > MAX_SURPRESAS) return null;
+  const ids = new Set<string>();
+  const validas: Extra["surpresas"] = [];
+  for (const item of surpresas) {
+    if (!item || typeof item !== "object") return null;
+    const a = item as Record<string, unknown>;
+    if (typeof a.id !== "string" || !a.id.trim() || a.id.length > 70 ||
+      typeof a.titulo !== "string" || !a.titulo.trim() || a.titulo.length > 100 ||
+      typeof a.mensagem !== "string" || !a.mensagem.trim() || a.mensagem.length > 600 ||
+      typeof a.data !== "string" || !dataValida(a.data) || a.data === "" ||
+      typeof a.anual !== "boolean" || ids.has(a.id)) return null;
+    ids.add(a.id);
+    validas.push({
+      id: a.id, titulo: a.titulo.trim(), mensagem: a.mensagem.trim(),
+      data: a.data, anual: a.anual,
+    });
+  }
+
   return {
     bilhetes: d.bilhetes.map(x => (x as string).trim()),
     sonhos: d.sonhos.map(x => ({
       id: texto(x.id, 70), titulo: texto(x.titulo, 140), concluido: x.concluido === true,
     })),
     musica: { titulo: musica.titulo.trim(), url: musica.url },
+    surpresas: validas,
   };
 }
 
@@ -154,7 +178,7 @@ Deno.serve(async (req: Request) => {
       const [memorias, extras] = await Promise.all([
         supabase.from("amor_memorias")
           .select("foto_indice,src,legenda,data,relato").order("foto_indice", { ascending: true }),
-        supabase.from("amor_extras").select("bilhetes,musica,sonhos").eq("id", 1).maybeSingle(),
+        supabase.from("amor_extras").select("bilhetes,musica,sonhos,surpresas").eq("id", 1).maybeSingle(),
       ]);
       if (memorias.error || extras.error) throw new Error("Leitura indisponível.");
       return json({
@@ -162,7 +186,7 @@ Deno.serve(async (req: Request) => {
           fotoIndice: row.foto_indice, src: row.src, legenda: row.legenda,
           data: row.data, relato: row.relato,
         })),
-        extras: extras.data || { bilhetes: [], musica: { titulo: "", url: "" }, sonhos: [] },
+        extras: extras.data || { bilhetes: [], musica: { titulo: "", url: "" }, sonhos: [], surpresas: [] },
       }, 200, cors);
     }
 
@@ -259,7 +283,15 @@ Deno.serve(async (req: Request) => {
 
     if (acao === "salvar-extras") {
       const extras = normalizarExtras(corpo);
-      if (!extras) return json({ erro: "Bilhetes, música ou sonhos inválidos." }, 400, cors);
+      if (!extras) return json({ erro: "Bilhetes, música, sonhos ou surpresas inválidos." }, 400, cors);
+      // Versões antigas do app salvam somente bilhetes/música/sonhos.
+      // Conserva as surpresas agendadas até que um cliente novo as modifique.
+      if (corpo && typeof corpo === "object" && !Object.prototype.hasOwnProperty.call(corpo, "surpresas")) {
+        const { data: anteriores, error: erroAnteriores } = await supabase
+          .from("amor_extras").select("surpresas").eq("id", 1).maybeSingle();
+        if (erroAnteriores) throw new Error("Não foi possível preservar as surpresas.");
+        extras.surpresas = Array.isArray(anteriores?.surpresas) ? anteriores.surpresas : [];
+      }
       const { data: podeEditar, error: erroLimite } = await supabase.rpc(
         "amor_reservar_edicao", { p_tipo: "escrita" }
       );

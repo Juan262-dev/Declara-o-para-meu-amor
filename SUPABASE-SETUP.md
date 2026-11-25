@@ -82,3 +82,15 @@ A migração criou seis cópias de base: as cinco memórias existentes e o regis
 O site oferece `manifest.webmanifest`, ícone SVG, instalador e cache do shell por `sw.js`. A instalação depende do navegador. O cache exclui requisições ao Supabase e sites de terceiros. Sem rede, a edição remota não funciona; a página pode mostrar as cinco memórias publicadas como alternativa.
 
 O `foto-otimizador.js` roda no celular antes do upload e reduz arquivos grandes com canvas, até 1800 px no maior lado, quando compatível. O limite de 5 MB do servidor, a validação MIME e o controle global de uploads permanecem iguais. O arquivo original não é modificado.
+
+
+## Cartinhas por data e temas
+
+A migração `202611250001_surpresas_programadas.sql` acrescenta `surpresas jsonb NOT NULL DEFAULT '[]'` à tabela `amor_extras`, sem apagar nem modificar `bilhetes`, `musica` ou `sonhos`. O campo armazena até 20 itens no formato:
+`{ id, titulo, mensagem, data: "AAAA-MM-DD", anual: boolean }`.
+
+A Edge Function `album-sync` valida o formato, os comprimentos e a data antes de gravar. A API continua sem login ou código; o histórico privado existente registra versões anteriores. A escrita feita por clientes antigos sem o campo `surpresas` preserva as cartinhas existentes.
+
+A interface só revela a mensagem conforme a data no relógio local: cartinhas não anuais desde a data; anuais no dia/mês combinado a partir do ano escolhido. **Não é conteúdo secreto:** como o álbum é público, é possível ler ou modificar cartinhas pelo serviço sem aguardar a data.
+
+Os temas ficam somente no `localStorage` do aparelho e não exigem novos privilégios no Supabase; os arquivos principais são `temas.js` e `styles.css`. O backup/exportação de surpresas inclui `surpresas`, e backups antigos não sobrescrevem a lista atual quando não trazem esse campo.

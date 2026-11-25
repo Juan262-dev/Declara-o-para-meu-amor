@@ -9,15 +9,16 @@
   <meta property="og:description" content="Um pedacinho da nossa história, feito com carinho.">
   <meta property="og:type" content="website">
   <title>Nossa História Infinita ❤️ | Para o meu amor</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=temas-1">
   <link rel="icon" type="image/svg+xml" href="assets/icone-app.svg">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Nosso Amor">
   <!-- Scripts do álbum carregam na sequência depois de buscar dados na nuvem. -->
   <script src="cloud-config.js?v=realtime-1" defer></script>
-  <script src="cloud-bootstrap.js?v=celular-1" defer></script>
+  <script src="cloud-bootstrap.js?v=surpresas-1" defer></script>
   <script src="pwa.js?v=celular-1" defer></script>
+  <script src="temas.js?v=temas-1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -48,6 +49,16 @@
     <button id="instalarApp" class="button button-outline button-small" type="button">♡ Adicionar à tela inicial</button>
     <span id="instalarAppStatus" role="status" aria-live="polite">Abra como aplicativo no celular. Offline, você pode consultar a cópia publicada do álbum.</span>
   </div>
+  <section class="seletor-tema" aria-labelledby="tituloSeletorTema">
+    <span id="tituloSeletorTema">Escolha as cores do nosso álbum</span>
+    <div class="temas-opcoes" role="group" aria-label="Temas do aplicativo">
+      <button type="button" data-tema-escolha="rosa" aria-pressed="true">🌷 Rosa</button>
+      <button type="button" data-tema-escolha="vermelho" aria-pressed="false">❤️ Vermelho</button>
+      <button type="button" data-tema-escolha="lilas" aria-pressed="false">💜 Lilás</button>
+      <button type="button" data-tema-escolha="escuro" aria-pressed="false">🌙 Escuro</button>
+    </div>
+    <span class="tema-ajuda">Sua escolha fica salva neste aparelho.</span>
+  </section>
   <div class="cloud-update-banner" id="cloudNewData" hidden>
     <span>♡ Existem lembranças novas na nuvem.</span>
     <button class="button button-outline button-small" id="cloudUpdateButton" type="button">Atualizar álbum ↻</button>
@@ -385,6 +396,40 @@
             <p class="extra-status" id="statusSonhos" role="status" aria-live="polite"></p>
           </article>
         </div>
+
+        <section class="cartinhas-datas" id="cartinhasDatas" aria-labelledby="tituloCartinhasDatas">
+          <div class="cartinhas-datas-header">
+            <span class="eyebrow">Cartinhas com data marcada</span>
+            <h3 id="tituloCartinhasDatas">Surpresas para os dias especiais ♡</h3>
+            <p>Escolha quando uma mensagem vai aparecer. Pode ser uma única data ou uma surpresa que volta todos os anos.</p>
+          </div>
+          <div id="listaSurpresasReveladas" class="cartinhas-datas-grid" aria-live="polite">
+            <p>Nenhuma cartinha programada ainda.</p>
+          </div>
+          <details class="cartinhas-datas-gerenciar">
+            <summary>✉ Programar ou editar cartinhas</summary>
+            <p class="cartinhas-privacidade">A revelação é um efeito visual, não uma proteção de privacidade. Como o álbum não tem login, qualquer visitante pode consultar ou alterar mensagens programadas.</p>
+            <form id="formSurpresaProgramada" class="extra-form">
+              <label for="surpresaTitulo">Título da cartinha</label>
+              <input id="surpresaTitulo" type="text" maxlength="100" required placeholder="Uma mensagem para um dia especial">
+              <label for="surpresaMensagem">Sua mensagem</label>
+              <textarea id="surpresaMensagem" rows="4" maxlength="600" required placeholder="Escreva uma cartinha para revelar nessa data..."></textarea>
+              <label for="surpresaData">Data para revelar</label>
+              <input id="surpresaData" type="date" required>
+              <label class="cartinhas-repetir">
+                <input id="surpresaAnual" type="checkbox">
+                Repetir a surpresa nesta data todos os anos
+              </label>
+              <div class="cartinhas-form-acoes">
+                <button id="salvarSurpresaProgramada" type="submit" class="button button-primary button-small">Programar cartinha ♡</button>
+                <button id="cancelarEdicaoSurpresa" type="button" class="button button-outline button-small" hidden>Cancelar edição</button>
+              </div>
+            </form>
+            <p id="statusSurpresasProgramadas" class="extra-status" role="status" aria-live="polite"></p>
+            <h4>Cartinhas programadas (até 20)</h4>
+            <ul id="listaSurpresasProgramadas" class="cartinhas-programadas-lista" aria-label="Gerenciar cartinhas por data"></ul>
+          </details>
+        </section>
       </div>
     </section>
 

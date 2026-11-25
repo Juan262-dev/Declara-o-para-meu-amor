@@ -120,3 +120,15 @@ Se a data ou o relato não forem conhecidos, deixe `data: null` e `relato: ''`. 
 - O álbum agora contém **cinco fotografias**, com as três originais preservadas e duas imagens locais novas.
 - As fotos 4 e 5 aparecem na galeria ampliável e nos capítulos; como não foram fornecidas datas ou histórias para elas, esses campos permanecem vazios.
 - Essas imagens ficam no repositório público junto do aplicativo.
+
+
+## Surpresas agendadas e temas visuais (Upgrade 2.0)
+
+- **Cartinhas por data:** na seção de extras, é possível criar, editar ou remover até 20 cartinhas, com título (até 100 caracteres), texto (até 600 caracteres) e data. O modo **anual** revela a cartinha **somente no dia/mês marcado**, a partir do ano escolhido; o modo de data única a revela **a partir da data marcada**. Não foi inventada nenhuma cartinha ou data: cada visitante escolhe o conteúdo.
+- **Sincronizadas na nuvem:** as cartinhas fazem parte do campo `surpresas` da tabela `amor_extras`, são verificadas pela Edge Function e aparecem em outros aparelhos pelo Realtime já existente.
+- **Compatibilidade:** alterações de bilhetes feitas por clientes mais antigos não apagam as cartinhas programadas. Backups JSON novos incluem as cartinhas; a restauração de backups antigos preserva as cartinhas que já existem.
+- **Temas:** rosa (padrão), vermelho, lilás e escuro, com escolha persistida por aparelho em `localStorage`. Os temas não mudam dados da nuvem nem as fotos originais; respeitam a preferência por movimento reduzido.
+- **Importante:** a revelação por data é **somente visual**, não é uma senha nem um cofre. O aplicativo permanece público, sem login ou código de edição, e os dados podem ser consultados ou alterados por visitantes.
+
+A migração `supabase/migrations/202611250001_surpresas_programadas.sql` acrescenta uma coluna JSONB sem excluir bilhetes, sonhos nem música. A Edge Function `album-sync` continua validando o conteúdo e os limites de escrita. As datas são interpretadas no horário local do aparelho.
+
