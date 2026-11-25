@@ -88,3 +88,15 @@ Nenhum acontecimento ou data de fotografias foi inventado.
 - **Otimização de fotos:** imagens grandes são reduzidas localmente antes do envio, preservando a original no aparelho. O servidor segue exigindo até 5 MB.
 - As cinco fotografias existentes e todo o conteúdo original foram mantidos.
 - A instalação, o modo offline e a compressão dependem dos recursos do navegador; devem ser testados no celular após publicação.
+
+
+## Etapa 9 — Cartinhas com data e personalização visual
+
+- Cartinhas programadas para uma data única ou repetição anual, com edição e remoção no app.
+- Mensagens ocultas visualmente até a data, sem alegação de sigilo ou privacidade.
+- Campo `surpresas` acrescentado à tabela `amor_extras`, preservando os registros existentes.
+- Validação server-side de até 20 cartinhas; leitura/escrita continuam pela mesma Edge Function pública, sem login/código.
+- Salvamento no Supabase, integração Realtime, backup JSON com migração de versões antigas.
+- Quatro temas visuais (rosa, vermelho, lilás, escuro), com preferência de cada aparelho.
+- Fotos, relatos e surpresas já existentes mantidos.
+
